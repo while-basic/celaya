@@ -9,8 +9,8 @@
 // Several examples of using this package are available [in the GitHub
 // repository].
 //
-// [the API documentation]: https://github.com/ollama/ollama/blob/main/docs/api.md
-// [in the GitHub repository]: https://github.com/ollama/ollama/tree/main/api/examples
+// [the API documentation]: https://github.com/celaya/celaya/blob/main/docs/api.md
+// [in the GitHub repository]: https://github.com/celaya/celaya/tree/main/api/examples
 package api
 
 import (
@@ -25,9 +25,9 @@ import (
 	"net/url"
 	"runtime"
 
-	"github.com/ollama/ollama/envconfig"
-	"github.com/ollama/ollama/format"
-	"github.com/ollama/ollama/version"
+	"github.com/celaya/celaya/envconfig"
+	"github.com/celaya/celaya/format"
+	"github.com/celaya/celaya/version"
 )
 
 // Client encapsulates client state for interacting with the ollama
@@ -255,7 +255,7 @@ func (c *Client) Pull(ctx context.Context, req *PullRequest, fn PullProgressFunc
 // It's similar to other progress function types like [PullProgressFunc].
 type PushProgressFunc func(ProgressResponse) error
 
-// Push uploads a model to the model library; requires registering for ollama.ai
+// Push uploads a model to the model library; requires registering for celayasolutions.com
 // and adding a public key first. fn is called each time progress is made on
 // the request and can be used to display a progress bar, etc.
 func (c *Client) Push(ctx context.Context, req *PushRequest, fn PushProgressFunc) error {
@@ -277,7 +277,7 @@ type CreateProgressFunc func(ProgressResponse) error
 // Create creates a model from a [Modelfile]. fn is a progress function that
 // behaves similarly to other methods (see [Client.Pull]).
 //
-// [Modelfile]: https://github.com/ollama/ollama/blob/main/docs/modelfile.md
+// [Modelfile]: https://github.com/celaya/celaya/blob/main/docs/modelfile.md
 func (c *Client) Create(ctx context.Context, req *CreateRequest, fn CreateProgressFunc) error {
 	return c.stream(ctx, http.MethodPost, "/api/create", req, func(bts []byte) error {
 		var resp ProgressResponse

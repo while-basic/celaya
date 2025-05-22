@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ollama/ollama/api"
+	"github.com/celaya/celaya/api"
 )
 
 // Command line flags

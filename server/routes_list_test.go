@@ -8,7 +8,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/ollama/ollama/api"
+	"github.com/celaya/celaya/api"
 )
 
 func TestList(t *testing.T) {

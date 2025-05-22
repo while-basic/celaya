@@ -7,11 +7,11 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/ollama/ollama/api"
-	"github.com/ollama/ollama/discover"
-	"github.com/ollama/ollama/envconfig"
-	"github.com/ollama/ollama/format"
-	"github.com/ollama/ollama/fs/ggml"
+	"github.com/celaya/celaya/api"
+	"github.com/celaya/celaya/discover"
+	"github.com/celaya/celaya/envconfig"
+	"github.com/celaya/celaya/format"
+	"github.com/celaya/celaya/fs/ggml"
 )
 
 // This algorithm looks for a complete fit to determine if we need to unload other models

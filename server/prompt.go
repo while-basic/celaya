@@ -9,9 +9,9 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/ollama/ollama/api"
-	"github.com/ollama/ollama/llm"
-	"github.com/ollama/ollama/template"
+	"github.com/celaya/celaya/api"
+	"github.com/celaya/celaya/llm"
+	"github.com/celaya/celaya/template"
 )
 
 type tokenizeFunc func(context.Context, string) ([]int, error)

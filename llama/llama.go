@@ -38,10 +38,10 @@ import (
 	"sync"
 	"unsafe"
 
-	_ "github.com/ollama/ollama/llama/llama.cpp/common"
-	_ "github.com/ollama/ollama/llama/llama.cpp/src"
-	_ "github.com/ollama/ollama/llama/llama.cpp/tools/mtmd"
-	ggml "github.com/ollama/ollama/ml/backend/ggml/ggml/src"
+	_ "github.com/celaya/celaya/llama/llama.cpp/common"
+	_ "github.com/celaya/celaya/llama/llama.cpp/src"
+	_ "github.com/celaya/celaya/llama/llama.cpp/tools/mtmd"
+	ggml "github.com/celaya/celaya/ml/backend/ggml/ggml/src"
 )
 
 func init() {

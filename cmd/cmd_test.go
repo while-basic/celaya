@@ -14,8 +14,8 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/spf13/cobra"
 
-	"github.com/ollama/ollama/api"
-	"github.com/ollama/ollama/types/model"
+	"github.com/celaya/celaya/api"
+	"github.com/celaya/celaya/types/model"
 )
 
 func TestShowInfo(t *testing.T) {
@@ -489,7 +489,7 @@ func TestPushHandler(t *testing.T) {
 					}
 				},
 			},
-			expectedOutput: "\nYou can find your model at:\n\n\thttps://ollama.com/test-model\n",
+			expectedOutput: "\nYou can find your model at:\n\n\thttps://celayasolutions.com/test-model\n",
 		},
 		{
 			name:      "unauthorized push",

@@ -9,8 +9,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/ollama/ollama/template"
-	"github.com/ollama/ollama/types/model"
+	"github.com/celaya/celaya/template"
+	"github.com/celaya/celaya/types/model"
 )
 
 // Constants for GGUF magic bytes and version

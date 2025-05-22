@@ -21,12 +21,12 @@ import (
 
 	"golang.org/x/sync/semaphore"
 
-	"github.com/ollama/ollama/api"
-	"github.com/ollama/ollama/envconfig"
-	"github.com/ollama/ollama/llama"
-	"github.com/ollama/ollama/llm"
-	"github.com/ollama/ollama/logutil"
-	"github.com/ollama/ollama/runner/common"
+	"github.com/celaya/celaya/api"
+	"github.com/celaya/celaya/envconfig"
+	"github.com/celaya/celaya/llama"
+	"github.com/celaya/celaya/llm"
+	"github.com/celaya/celaya/logutil"
+	"github.com/celaya/celaya/runner/common"
 )
 
 // input is an element of the prompt to process, either

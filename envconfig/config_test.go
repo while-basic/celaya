@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/ollama/ollama/logutil"
+	"github.com/celaya/celaya/logutil"
 )
 
 func TestHost(t *testing.T) {

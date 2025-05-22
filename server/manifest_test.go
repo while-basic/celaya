@@ -7,7 +7,7 @@ import (
 	"slices"
 	"testing"
 
-	"github.com/ollama/ollama/types/model"
+	"github.com/celaya/celaya/types/model"
 )
 
 func createManifest(t *testing.T, path, name string) {
@@ -44,21 +44,21 @@ func TestManifests(t *testing.T) {
 		},
 		"multiple": {
 			ps: []string{
-				filepath.Join("registry.ollama.ai", "library", "llama3", "latest"),
-				filepath.Join("registry.ollama.ai", "library", "llama3", "q4_0"),
-				filepath.Join("registry.ollama.ai", "library", "llama3", "q4_1"),
-				filepath.Join("registry.ollama.ai", "library", "llama3", "q8_0"),
-				filepath.Join("registry.ollama.ai", "library", "llama3", "q5_0"),
-				filepath.Join("registry.ollama.ai", "library", "llama3", "q5_1"),
-				filepath.Join("registry.ollama.ai", "library", "llama3", "q2_K"),
-				filepath.Join("registry.ollama.ai", "library", "llama3", "q3_K_S"),
-				filepath.Join("registry.ollama.ai", "library", "llama3", "q3_K_M"),
-				filepath.Join("registry.ollama.ai", "library", "llama3", "q3_K_L"),
-				filepath.Join("registry.ollama.ai", "library", "llama3", "q4_K_S"),
-				filepath.Join("registry.ollama.ai", "library", "llama3", "q4_K_M"),
-				filepath.Join("registry.ollama.ai", "library", "llama3", "q5_K_S"),
-				filepath.Join("registry.ollama.ai", "library", "llama3", "q5_K_M"),
-				filepath.Join("registry.ollama.ai", "library", "llama3", "q6_K"),
+				filepath.Join("registry.celayasolutions.com", "library", "llama3", "latest"),
+				filepath.Join("registry.celayasolutions.com", "library", "llama3", "q4_0"),
+				filepath.Join("registry.celayasolutions.com", "library", "llama3", "q4_1"),
+				filepath.Join("registry.celayasolutions.com", "library", "llama3", "q8_0"),
+				filepath.Join("registry.celayasolutions.com", "library", "llama3", "q5_0"),
+				filepath.Join("registry.celayasolutions.com", "library", "llama3", "q5_1"),
+				filepath.Join("registry.celayasolutions.com", "library", "llama3", "q2_K"),
+				filepath.Join("registry.celayasolutions.com", "library", "llama3", "q3_K_S"),
+				filepath.Join("registry.celayasolutions.com", "library", "llama3", "q3_K_M"),
+				filepath.Join("registry.celayasolutions.com", "library", "llama3", "q3_K_L"),
+				filepath.Join("registry.celayasolutions.com", "library", "llama3", "q4_K_S"),
+				filepath.Join("registry.celayasolutions.com", "library", "llama3", "q4_K_M"),
+				filepath.Join("registry.celayasolutions.com", "library", "llama3", "q5_K_S"),
+				filepath.Join("registry.celayasolutions.com", "library", "llama3", "q5_K_M"),
+				filepath.Join("registry.celayasolutions.com", "library", "llama3", "q6_K"),
 			},
 			wantValidCount: 15,
 		},

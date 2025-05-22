@@ -6,7 +6,7 @@ No more WSL required!
 
 Ollama now runs as a native Windows application, including NVIDIA and AMD Radeon GPU support.
 After installing Ollama for Windows, Ollama will run in the background and
-the `ollama` command line is available in `cmd`, `powershell` or your favorite
+the `celaya` command line is available in `cmd`, `powershell` or your favorite
 terminal application. As usual the Ollama [api](./api.md) will be served on
 `http://localhost:11434`.
 
@@ -61,7 +61,7 @@ the explorer window by hitting `<Ctrl>+R` and type in:
     - *server.log* contains the most recent server logs
     - *upgrade.log* contains log output for upgrades
 - `explorer %LOCALAPPDATA%\Programs\Ollama` contains the binaries (The installer adds this to your user PATH)
-- `explorer %HOMEPATH%\.ollama` contains models and configuration
+- `explorer %HOMEPATH%\.celaya` contains models and configuration
 
 ## Uninstall
 
@@ -79,11 +79,11 @@ We update Ollama regularly to support the latest models, and this installer will
 help you keep up to date.
 
 If you'd like to install or integrate Ollama as a service, a standalone
-`ollama-windows-amd64.zip` zip file is available containing only the Ollama CLI
+`celaya-windows-amd64.zip` zip file is available containing only the Ollama CLI
 and GPU library dependencies for Nvidia.  If you have an AMD GPU, also download
-and extract the additional ROCm package `ollama-windows-amd64-rocm.zip` into the
+and extract the additional ROCm package `celaya-windows-amd64-rocm.zip` into the
 same directory.  This allows for embedding Ollama in existing applications, or
-running it as a system service via `ollama serve` with tools such as
+running it as a system service via `celaya serve` with tools such as
 [NSSM](https://nssm.cc/). 
 
 > [!NOTE]  

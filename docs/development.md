@@ -149,11 +149,11 @@ go test ./...
 
 ## Library detection
 
-Ollama looks for acceleration libraries in the following paths relative to the `ollama` executable:
+Ollama looks for acceleration libraries in the following paths relative to the `celaya` executable:
 
-* `./lib/ollama` (Windows)
-* `../lib/ollama` (Linux)
+* `./lib/celaya` (Windows)
+* `../lib/celaya` (Linux)
 * `.` (macOS)
-* `build/lib/ollama` (for development)
+* `build/lib/celaya` (for development)
 
 If the libraries are not found, Ollama will not run with any acceleration libraries.

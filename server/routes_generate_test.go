@@ -14,10 +14,10 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/go-cmp/cmp"
 
-	"github.com/ollama/ollama/api"
-	"github.com/ollama/ollama/discover"
-	"github.com/ollama/ollama/fs/ggml"
-	"github.com/ollama/ollama/llm"
+	"github.com/celaya/celaya/api"
+	"github.com/celaya/celaya/discover"
+	"github.com/celaya/celaya/fs/ggml"
+	"github.com/celaya/celaya/llm"
 )
 
 type mockRunner struct {
@@ -734,7 +734,7 @@ func TestGenerate(t *testing.T) {
 			t.Errorf("expected status 400, got %d", w.Code)
 		}
 
-		if diff := cmp.Diff(w.Body.String(), `{"error":"registry.ollama.ai/library/test:latest does not support insert"}`); diff != "" {
+		if diff := cmp.Diff(w.Body.String(), `{"error":"registry.celayasolutions.com/library/test:latest does not support insert"}`); diff != "" {
 			t.Errorf("mismatch (-got +want):\n%s", diff)
 		}
 	})

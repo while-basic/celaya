@@ -1,6 +1,6 @@
 #!/bin/sh
-# This script installs Ollama on Linux.
-# It detects the current operating system architecture and installs the appropriate version of Ollama.
+# This script installs Celaya on Linux.
+# It detects the current operating system architecture and installs the appropriate version of Celaya.
 
 set -eu
 
@@ -45,7 +45,7 @@ case "$KERN" in
     *) ;;
 esac
 
-VER_PARAM="${OLLAMA_VERSION:+?version=$OLLAMA_VERSION}"
+VER_PARAM="${CELAYA_VERSION:+?version=$CELAYA_VERSION}"
 
 SUDO=
 if [ "$(id -u)" -ne 0 ]; then
@@ -69,23 +69,23 @@ fi
 for BINDIR in /usr/local/bin /usr/bin /bin; do
     echo $PATH | grep -q $BINDIR && break || continue
 done
-OLLAMA_INSTALL_DIR=$(dirname ${BINDIR})
+CELAYA_INSTALL_DIR=$(dirname ${BINDIR})
 
-if [ -d "$OLLAMA_INSTALL_DIR/lib/ollama" ] ; then
-    status "Cleaning up old version at $OLLAMA_INSTALL_DIR/lib/ollama"
-    $SUDO rm -rf "$OLLAMA_INSTALL_DIR/lib/ollama"
+if [ -d "$CELAYA_INSTALL_DIR/lib/celaya" ] ; then
+    status "Cleaning up old version at $CELAYA_INSTALL_DIR/lib/celaya"
+    $SUDO rm -rf "$CELAYA_INSTALL_DIR/lib/celaya"
 fi
-status "Installing ollama to $OLLAMA_INSTALL_DIR"
+status "Installing celaya to $CELAYA_INSTALL_DIR"
 $SUDO install -o0 -g0 -m755 -d $BINDIR
-$SUDO install -o0 -g0 -m755 -d "$OLLAMA_INSTALL_DIR/lib/ollama"
+$SUDO install -o0 -g0 -m755 -d "$CELAYA_INSTALL_DIR/lib/celaya"
 status "Downloading Linux ${ARCH} bundle"
 curl --fail --show-error --location --progress-bar \
-    "https://ollama.com/download/ollama-linux-${ARCH}.tgz${VER_PARAM}" | \
-    $SUDO tar -xzf - -C "$OLLAMA_INSTALL_DIR"
+    "https://celayasolutions.com/download/celaya-linux-${ARCH}.tgz${VER_PARAM}" | \
+    $SUDO tar -xzf - -C "$CELAYA_INSTALL_DIR"
 
-if [ "$OLLAMA_INSTALL_DIR/bin/ollama" != "$BINDIR/ollama" ] ; then
-    status "Making ollama accessible in the PATH in $BINDIR"
-    $SUDO ln -sf "$OLLAMA_INSTALL_DIR/ollama" "$BINDIR/ollama"
+if [ "$CELAYA_INSTALL_DIR/bin/celaya" != "$BINDIR/celaya" ] ; then
+    status "Making celaya accessible in the PATH in $BINDIR"
+    $SUDO ln -sf "$CELAYA_INSTALL_DIR/celaya" "$BINDIR/celaya"
 fi
 
 # Check for NVIDIA JetPack systems with additional downloads
@@ -93,53 +93,53 @@ if [ -f /etc/nv_tegra_release ] ; then
     if grep R36 /etc/nv_tegra_release > /dev/null ; then
         status "Downloading JetPack 6 components"
         curl --fail --show-error --location --progress-bar \
-            "https://ollama.com/download/ollama-linux-${ARCH}-jetpack6.tgz${VER_PARAM}" | \
-            $SUDO tar -xzf - -C "$OLLAMA_INSTALL_DIR"
+            "https://celayasolutions.com/download/celaya-linux-${ARCH}-jetpack6.tgz${VER_PARAM}" | \
+            $SUDO tar -xzf - -C "$CELAYA_INSTALL_DIR"
     elif grep R35 /etc/nv_tegra_release > /dev/null ; then
         status "Downloading JetPack 5 components"
         curl --fail --show-error --location --progress-bar \
-            "https://ollama.com/download/ollama-linux-${ARCH}-jetpack5.tgz${VER_PARAM}" | \
-            $SUDO tar -xzf - -C "$OLLAMA_INSTALL_DIR"
+            "https://celayasolutions.com/download/celaya-linux-${ARCH}-jetpack5.tgz${VER_PARAM}" | \
+            $SUDO tar -xzf - -C "$CELAYA_INSTALL_DIR"
     else
         warning "Unsupported JetPack version detected.  GPU may not be supported"
     fi
 fi
 
 install_success() {
-    status 'The Ollama API is now available at 127.0.0.1:11434.'
-    status 'Install complete. Run "ollama" from the command line.'
+    status 'The Celaya API is now available at 127.0.0.1:11434.'
+    status 'Install complete. Run "celaya" from the command line.'
 }
 trap install_success EXIT
 
 # Everything from this point onwards is optional.
 
 configure_systemd() {
-    if ! id ollama >/dev/null 2>&1; then
-        status "Creating ollama user..."
-        $SUDO useradd -r -s /bin/false -U -m -d /usr/share/ollama ollama
+    if ! id celaya >/dev/null 2>&1; then
+        status "Creating celaya user..."
+        $SUDO useradd -r -s /bin/false -U -m -d /usr/share/celaya celaya
     fi
     if getent group render >/dev/null 2>&1; then
-        status "Adding ollama user to render group..."
-        $SUDO usermod -a -G render ollama
+        status "Adding celaya user to render group..."
+        $SUDO usermod -a -G render celaya
     fi
     if getent group video >/dev/null 2>&1; then
-        status "Adding ollama user to video group..."
-        $SUDO usermod -a -G video ollama
+        status "Adding celaya user to video group..."
+        $SUDO usermod -a -G video celaya
     fi
 
-    status "Adding current user to ollama group..."
-    $SUDO usermod -a -G ollama $(whoami)
+    status "Adding current user to celaya group..."
+    $SUDO usermod -a -G celaya $(whoami)
 
-    status "Creating ollama systemd service..."
-    cat <<EOF | $SUDO tee /etc/systemd/system/ollama.service >/dev/null
+    status "Creating celaya systemd service..."
+    cat <<EOF | $SUDO tee /etc/systemd/system/celaya.service >/dev/null
 [Unit]
-Description=Ollama Service
+Description=Celaya Service
 After=network-online.target
 
 [Service]
-ExecStart=$BINDIR/ollama serve
-User=ollama
-Group=ollama
+ExecStart=$BINDIR/celaya serve
+User=celaya
+Group=celaya
 Restart=always
 RestartSec=3
 Environment="PATH=$PATH"
@@ -150,11 +150,11 @@ EOF
     SYSTEMCTL_RUNNING="$(systemctl is-system-running || true)"
     case $SYSTEMCTL_RUNNING in
         running|degraded)
-            status "Enabling and starting ollama service..."
+            status "Enabling and starting celaya service..."
             $SUDO systemctl daemon-reload
-            $SUDO systemctl enable ollama
+            $SUDO systemctl enable celaya
 
-            start_service() { $SUDO systemctl restart ollama; }
+            start_service() { $SUDO systemctl restart celaya; }
             trap start_service EXIT
             ;;
         *)
@@ -217,15 +217,15 @@ fi
 
 if ! check_gpu lspci nvidia && ! check_gpu lshw nvidia && ! check_gpu lspci amdgpu && ! check_gpu lshw amdgpu; then
     install_success
-    warning "No NVIDIA/AMD GPU detected. Ollama will run in CPU-only mode."
+    warning "No NVIDIA/AMD GPU detected. Celaya will run in CPU-only mode."
     exit 0
 fi
 
 if check_gpu lspci amdgpu || check_gpu lshw amdgpu; then
     status "Downloading Linux ROCm ${ARCH} bundle"
     curl --fail --show-error --location --progress-bar \
-        "https://ollama.com/download/ollama-linux-${ARCH}-rocm.tgz${VER_PARAM}" | \
-        $SUDO tar -xzf - -C "$OLLAMA_INSTALL_DIR"
+        "https://celayasolutions.com/download/celaya-linux-${ARCH}-rocm.tgz${VER_PARAM}" | \
+    $SUDO tar -xzf - -C "$CELAYA_INSTALL_DIR"
 
     install_success
     status "AMD GPU ready."

@@ -26,8 +26,8 @@ ENV CC=clang CXX=clang++
 FROM base-${TARGETARCH} AS base
 ARG CMAKEVERSION
 RUN curl -fsSL https://github.com/Kitware/CMake/releases/download/v${CMAKEVERSION}/cmake-${CMAKEVERSION}-linux-$(uname -m).tar.gz | tar xz -C /usr/local --strip-components 1
-COPY CMakeLists.txt CMakePresets.json .
-COPY ml/backend/ggml/ggml ml/backend/ggml/ggml
+COPY CMakeLists.txt CMakePresets.json ./
+COPY ml/backend/ggml/ggml ml/backend/ggml/ggml/
 ENV LDFLAGS=-s
 
 FROM base AS cpu
@@ -67,8 +67,8 @@ FROM --platform=linux/arm64 nvcr.io/nvidia/l4t-jetpack:${JETPACK5VERSION} AS jet
 ARG CMAKEVERSION
 RUN apt-get update && apt-get install -y curl ccache \
     && curl -fsSL https://github.com/Kitware/CMake/releases/download/v${CMAKEVERSION}/cmake-${CMAKEVERSION}-linux-$(uname -m).tar.gz | tar xz -C /usr/local --strip-components 1
-COPY CMakeLists.txt CMakePresets.json .
-COPY ml/backend/ggml/ggml ml/backend/ggml/ggml
+COPY CMakeLists.txt CMakePresets.json ./
+COPY ml/backend/ggml/ggml ml/backend/ggml/ggml/
 RUN --mount=type=cache,target=/root/.ccache \
     cmake --preset 'JetPack 5' \
         && cmake --build --parallel --preset 'JetPack 5' \
@@ -78,16 +78,16 @@ FROM --platform=linux/arm64 nvcr.io/nvidia/l4t-jetpack:${JETPACK6VERSION} AS jet
 ARG CMAKEVERSION
 RUN apt-get update && apt-get install -y curl ccache \
     && curl -fsSL https://github.com/Kitware/CMake/releases/download/v${CMAKEVERSION}/cmake-${CMAKEVERSION}-linux-$(uname -m).tar.gz | tar xz -C /usr/local --strip-components 1
-COPY CMakeLists.txt CMakePresets.json .
-COPY ml/backend/ggml/ggml ml/backend/ggml/ggml
+COPY CMakeLists.txt CMakePresets.json ./
+COPY ml/backend/ggml/ggml ml/backend/ggml/ggml/
 RUN --mount=type=cache,target=/root/.ccache \
     cmake --preset 'JetPack 6' \
         && cmake --build --parallel --preset 'JetPack 6' \
         && cmake --install build --component CUDA --strip --parallel 8
 
 FROM base AS build
-WORKDIR /go/src/github.com/ollama/ollama
-COPY go.mod go.sum .
+WORKDIR /go/src/github.com/celaya/celaya
+COPY go.mod go.sum ./
 RUN curl -fsSL https://golang.org/dl/go$(awk '/^go/ { print $2 }' go.mod).linux-$(case $(uname -m) in x86_64) echo amd64 ;; aarch64) echo arm64 ;; esac).tar.gz | tar xz -C /usr/local
 ENV PATH=/usr/local/go/bin:$PATH
 RUN go mod download
@@ -95,24 +95,24 @@ COPY . .
 ARG GOFLAGS="'-ldflags=-w -s'"
 ENV CGO_ENABLED=1
 RUN --mount=type=cache,target=/root/.cache/go-build \
-    go build -trimpath -buildmode=pie -o /bin/ollama .
+    go build -trimpath -buildmode=pie -o /bin/celaya .
 
 FROM --platform=linux/amd64 scratch AS amd64
-COPY --from=cuda-11 dist/lib/ollama/cuda_v11 /lib/ollama/cuda_v11
-COPY --from=cuda-12 dist/lib/ollama/cuda_v12 /lib/ollama/cuda_v12
+COPY --from=cuda-11 dist/lib/celaya/cuda_v11 /lib/celaya/cuda_v11
+COPY --from=cuda-12 dist/lib/celaya/cuda_v12 /lib/celaya/cuda_v12
 
 FROM --platform=linux/arm64 scratch AS arm64
-COPY --from=cuda-11 dist/lib/ollama/cuda_v11 /lib/ollama/cuda_v11
-COPY --from=cuda-12 dist/lib/ollama/cuda_v12 /lib/ollama/cuda_v12
-COPY --from=jetpack-5 dist/lib/ollama/cuda_v11 /lib/ollama/cuda_jetpack5
-COPY --from=jetpack-6 dist/lib/ollama/cuda_v12 /lib/ollama/cuda_jetpack6
+COPY --from=cuda-11 dist/lib/celaya/cuda_v11 /lib/celaya/cuda_v11
+COPY --from=cuda-12 dist/lib/celaya/cuda_v12 /lib/celaya/cuda_v12
+COPY --from=jetpack-5 dist/lib/celaya/cuda_v11 /lib/celaya/cuda_jetpack5
+COPY --from=jetpack-6 dist/lib/celaya/cuda_v12 /lib/celaya/cuda_jetpack6
 
 FROM scratch AS rocm
-COPY --from=rocm-6 dist/lib/ollama/rocm /lib/ollama/rocm
+COPY --from=rocm-6 dist/lib/celaya/rocm /lib/celaya/rocm
 
 FROM ${FLAVOR} AS archive
-COPY --from=cpu dist/lib/ollama /lib/ollama
-COPY --from=build /bin/ollama /bin/ollama
+COPY --from=cpu dist/lib/celaya /lib/celaya
+COPY --from=build /bin/celaya /bin/celaya
 
 FROM ubuntu:20.04
 RUN apt-get update \
@@ -121,11 +121,11 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 COPY --from=archive /bin /usr/bin
 ENV PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-COPY --from=archive /lib/ollama /usr/lib/ollama
+COPY --from=archive /lib/celaya /usr/lib/celaya
 ENV LD_LIBRARY_PATH=/usr/local/nvidia/lib:/usr/local/nvidia/lib64
 ENV NVIDIA_DRIVER_CAPABILITIES=compute,utility
 ENV NVIDIA_VISIBLE_DEVICES=all
-ENV OLLAMA_HOST=0.0.0.0:11434
+ENV CELAYA_HOST=0.0.0.0:11434
 EXPOSE 11434
-ENTRYPOINT ["/bin/ollama"]
+ENTRYPOINT ["/bin/celaya"]
 CMD ["serve"]

@@ -19,7 +19,7 @@ import (
 
 	"golang.org/x/exp/maps"
 
-	"github.com/ollama/ollama/fs/ggml"
+	"github.com/celaya/celaya/fs/ggml"
 )
 
 type tensorData struct {

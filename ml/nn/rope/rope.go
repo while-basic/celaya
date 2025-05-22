@@ -1,6 +1,6 @@
 package rope
 
-import "github.com/ollama/ollama/ml"
+import "github.com/celaya/celaya/ml"
 
 // Options contains optional parameters for RoPE function
 type Options struct {

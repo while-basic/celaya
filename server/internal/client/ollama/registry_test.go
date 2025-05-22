@@ -18,8 +18,8 @@ import (
 	"sync/atomic"
 	"testing"
 
-	"github.com/ollama/ollama/server/internal/cache/blob"
-	"github.com/ollama/ollama/server/internal/testutil"
+	"github.com/celaya/celaya/server/internal/cache/blob"
+	"github.com/celaya/celaya/server/internal/testutil"
 )
 
 func ExampleRegistry_cancelOnFirstError() {
@@ -557,7 +557,7 @@ func TestUnlink(t *testing.T) {
 		d := blob.DigestFromBytes("{}")
 		err := blob.PutBytes(rc.Cache, d, "{}")
 		check(err)
-		err = rc.Cache.Link("registry.ollama.ai/library/single:latest", d)
+		err = rc.Cache.Link("registry.celayasolutions.com/library/single:latest", d)
 		check(err)
 
 		// confirm linked

@@ -9,8 +9,8 @@ import (
 
 	"golang.org/x/image/draw"
 
-	"github.com/ollama/ollama/fs"
-	"github.com/ollama/ollama/model/imageproc"
+	"github.com/celaya/celaya/fs"
+	"github.com/celaya/celaya/model/imageproc"
 )
 
 type ImageProcessor struct {

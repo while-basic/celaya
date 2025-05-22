@@ -19,12 +19,12 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ollama/ollama/auth"
-	"github.com/ollama/ollama/version"
+	"github.com/celaya/celaya/auth"
+	"github.com/celaya/celaya/version"
 )
 
 var (
-	UpdateCheckURLBase  = "https://ollama.com/api/update"
+	UpdateCheckURLBase  = "https://celayasolutions.com/api/update"
 	UpdateDownloaded    = false
 	UpdateCheckInterval = 60 * 60 * time.Second
 )

@@ -14,10 +14,10 @@ import (
 	"strings"
 	"text/template/parse"
 
-	"github.com/ollama/ollama/api"
-	"github.com/ollama/ollama/fs/ggml"
-	"github.com/ollama/ollama/template"
-	"github.com/ollama/ollama/types/model"
+	"github.com/celaya/celaya/api"
+	"github.com/celaya/celaya/fs/ggml"
+	"github.com/celaya/celaya/template"
+	"github.com/celaya/celaya/types/model"
 )
 
 var intermediateBlobs map[string]string = make(map[string]string)

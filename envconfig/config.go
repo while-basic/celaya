@@ -14,12 +14,12 @@ import (
 	"time"
 )
 
-// Host returns the scheme and host. Host can be configured via the OLLAMA_HOST environment variable.
+// Host returns the scheme and host. Host can be configured via the CELAYA_HOST environment variable.
 // Default is scheme "http" and host "127.0.0.1:11434"
 func Host() *url.URL {
 	defaultPort := "11434"
 
-	s := strings.TrimSpace(Var("OLLAMA_HOST"))
+	s := strings.TrimSpace(Var("CELAYA_HOST"))
 	scheme, hostport, ok := strings.Cut(s, "://")
 	switch {
 	case !ok:
@@ -53,9 +53,9 @@ func Host() *url.URL {
 	}
 }
 
-// AllowedOrigins returns a list of allowed origins. AllowedOrigins can be configured via the OLLAMA_ORIGINS environment variable.
+// AllowedOrigins returns a list of allowed origins. AllowedOrigins can be configured via the CELAYA_ORIGINS environment variable.
 func AllowedOrigins() (origins []string) {
-	if s := Var("OLLAMA_ORIGINS"); s != "" {
+	if s := Var("CELAYA_ORIGINS"); s != "" {
 		origins = strings.Split(s, ",")
 	}
 
@@ -79,10 +79,10 @@ func AllowedOrigins() (origins []string) {
 	return origins
 }
 
-// Models returns the path to the models directory. Models directory can be configured via the OLLAMA_MODELS environment variable.
-// Default is $HOME/.ollama/models
+// Models returns the path to the models directory. Models directory can be configured via the CELAYA_MODELS environment variable.
+// Default is $HOME/.celaya/models
 func Models() string {
-	if s := Var("OLLAMA_MODELS"); s != "" {
+	if s := Var("CELAYA_MODELS"); s != "" {
 		return s
 	}
 
@@ -91,15 +91,15 @@ func Models() string {
 		panic(err)
 	}
 
-	return filepath.Join(home, ".ollama", "models")
+	return filepath.Join(home, ".celaya", "models")
 }
 
-// KeepAlive returns the duration that models stay loaded in memory. KeepAlive can be configured via the OLLAMA_KEEP_ALIVE environment variable.
+// KeepAlive returns the duration that models stay loaded in memory. KeepAlive can be configured via the CELAYA_KEEP_ALIVE environment variable.
 // Negative values are treated as infinite. Zero is treated as no keep alive.
 // Default is 5 minutes.
 func KeepAlive() (keepAlive time.Duration) {
 	keepAlive = 5 * time.Minute
-	if s := Var("OLLAMA_KEEP_ALIVE"); s != "" {
+	if s := Var("CELAYA_KEEP_ALIVE"); s != "" {
 		if d, err := time.ParseDuration(s); err == nil {
 			keepAlive = d
 		} else if n, err := strconv.ParseInt(s, 10, 64); err == nil {
@@ -114,12 +114,12 @@ func KeepAlive() (keepAlive time.Duration) {
 	return keepAlive
 }
 
-// LoadTimeout returns the duration for stall detection during model loads. LoadTimeout can be configured via the OLLAMA_LOAD_TIMEOUT environment variable.
+// LoadTimeout returns the duration for stall detection during model loads. LoadTimeout can be configured via the CELAYA_LOAD_TIMEOUT environment variable.
 // Zero or Negative values are treated as infinite.
 // Default is 5 minutes.
 func LoadTimeout() (loadTimeout time.Duration) {
 	loadTimeout = 5 * time.Minute
-	if s := Var("OLLAMA_LOAD_TIMEOUT"); s != "" {
+	if s := Var("CELAYA_LOAD_TIMEOUT"); s != "" {
 		if d, err := time.ParseDuration(s); err == nil {
 			loadTimeout = d
 		} else if n, err := strconv.ParseInt(s, 10, 64); err == nil {
@@ -153,7 +153,7 @@ func Bool(k string) func() bool {
 // Values are 0 or false INFO (Default), 1 or true DEBUG, 2 TRACE
 func LogLevel() slog.Level {
 	level := slog.LevelInfo
-	if s := Var("OLLAMA_DEBUG"); s != "" {
+	if s := Var("CELAYA_DEBUG"); s != "" {
 		if b, _ := strconv.ParseBool(s); b {
 			level = slog.LevelDebug
 		} else if i, _ := strconv.ParseInt(s, 10, 64); i != 0 {
@@ -166,23 +166,23 @@ func LogLevel() slog.Level {
 
 var (
 	// FlashAttention enables the experimental flash attention feature.
-	FlashAttention = Bool("OLLAMA_FLASH_ATTENTION")
+	FlashAttention = Bool("CELAYA_FLASH_ATTENTION")
 	// KvCacheType is the quantization type for the K/V cache.
-	KvCacheType = String("OLLAMA_KV_CACHE_TYPE")
+	KvCacheType = String("CELAYA_KV_CACHE_TYPE")
 	// NoHistory disables readline history.
-	NoHistory = Bool("OLLAMA_NOHISTORY")
+	NoHistory = Bool("CELAYA_NOHISTORY")
 	// NoPrune disables pruning of model blobs on startup.
-	NoPrune = Bool("OLLAMA_NOPRUNE")
+	NoPrune = Bool("CELAYA_NOPRUNE")
 	// SchedSpread allows scheduling models across all GPUs.
-	SchedSpread = Bool("OLLAMA_SCHED_SPREAD")
+	SchedSpread = Bool("CELAYA_SCHED_SPREAD")
 	// IntelGPU enables experimental Intel GPU detection.
-	IntelGPU = Bool("OLLAMA_INTEL_GPU")
+	IntelGPU = Bool("CELAYA_INTEL_GPU")
 	// MultiUserCache optimizes prompt caching for multi-user scenarios
-	MultiUserCache = Bool("OLLAMA_MULTIUSER_CACHE")
-	// Enable the new Ollama engine
-	NewEngine = Bool("OLLAMA_NEW_ENGINE")
+	MultiUserCache = Bool("CELAYA_MULTIUSER_CACHE")
+	// Enable the new Celaya engine
+	NewEngine = Bool("CELAYA_NEW_ENGINE")
 	// ContextLength sets the default context length
-	ContextLength = Uint("OLLAMA_CONTEXT_LENGTH", 4096)
+	ContextLength = Uint("CELAYA_CONTEXT_LENGTH", 4096)
 )
 
 func String(s string) func() string {
@@ -192,7 +192,7 @@ func String(s string) func() string {
 }
 
 var (
-	LLMLibrary = String("OLLAMA_LLM_LIBRARY")
+	LLMLibrary = String("CELAYA_LLM_LIBRARY")
 
 	CudaVisibleDevices    = String("CUDA_VISIBLE_DEVICES")
 	HipVisibleDevices     = String("HIP_VISIBLE_DEVICES")
@@ -216,12 +216,12 @@ func Uint(key string, defaultValue uint) func() uint {
 }
 
 var (
-	// NumParallel sets the number of parallel model requests. NumParallel can be configured via the OLLAMA_NUM_PARALLEL environment variable.
-	NumParallel = Uint("OLLAMA_NUM_PARALLEL", 0)
-	// MaxRunners sets the maximum number of loaded models. MaxRunners can be configured via the OLLAMA_MAX_LOADED_MODELS environment variable.
-	MaxRunners = Uint("OLLAMA_MAX_LOADED_MODELS", 0)
-	// MaxQueue sets the maximum number of queued requests. MaxQueue can be configured via the OLLAMA_MAX_QUEUE environment variable.
-	MaxQueue = Uint("OLLAMA_MAX_QUEUE", 512)
+	// NumParallel sets the number of parallel model requests. NumParallel can be configured via the CELAYA_NUM_PARALLEL environment variable.
+	NumParallel = Uint("CELAYA_NUM_PARALLEL", 0)
+	// MaxRunners sets the maximum number of loaded models. MaxRunners can be configured via the CELAYA_MAX_LOADED_MODELS environment variable.
+	MaxRunners = Uint("CELAYA_MAX_LOADED_MODELS", 0)
+	// MaxQueue sets the maximum number of queued requests. MaxQueue can be configured via the CELAYA_MAX_QUEUE environment variable.
+	MaxQueue = Uint("CELAYA_MAX_QUEUE", 512)
 )
 
 func Uint64(key string, defaultValue uint64) func() uint64 {
@@ -239,7 +239,7 @@ func Uint64(key string, defaultValue uint64) func() uint64 {
 }
 
 // Set aside VRAM per GPU
-var GpuOverhead = Uint64("OLLAMA_GPU_OVERHEAD", 0)
+var GpuOverhead = Uint64("CELAYA_GPU_OVERHEAD", 0)
 
 type EnvVar struct {
 	Name        string

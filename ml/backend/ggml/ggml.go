@@ -24,13 +24,13 @@ import (
 	"unicode"
 	"unsafe"
 
-	"github.com/ollama/ollama/format"
-	"github.com/ollama/ollama/fs"
-	fsggml "github.com/ollama/ollama/fs/ggml"
-	"github.com/ollama/ollama/logutil"
-	"github.com/ollama/ollama/ml"
-	ggml "github.com/ollama/ollama/ml/backend/ggml/ggml/src"
-	"github.com/ollama/ollama/ml/nn/rope"
+	"github.com/celaya/celaya/format"
+	"github.com/celaya/celaya/fs"
+	fsggml "github.com/celaya/celaya/fs/ggml"
+	"github.com/celaya/celaya/logutil"
+	"github.com/celaya/celaya/ml"
+	ggml "github.com/celaya/celaya/ml/backend/ggml/ggml/src"
+	"github.com/celaya/celaya/ml/nn/rope"
 	"golang.org/x/sync/errgroup"
 )
 

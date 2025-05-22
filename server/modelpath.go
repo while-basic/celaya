@@ -10,8 +10,8 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/ollama/ollama/envconfig"
-	"github.com/ollama/ollama/types/model"
+	"github.com/celaya/celaya/envconfig"
+	"github.com/celaya/celaya/types/model"
 )
 
 type ModelPath struct {
@@ -23,7 +23,7 @@ type ModelPath struct {
 }
 
 const (
-	DefaultRegistry       = "registry.ollama.ai"
+	DefaultRegistry       = "registry.celayasolutions.com"
 	DefaultNamespace      = "library"
 	DefaultTag            = "latest"
 	DefaultProtocolScheme = "https"

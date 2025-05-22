@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-// https://github.com/ollama/ollama/issues/7978
+// https://github.com/celaya/celaya/issues/7978
 const issue7978JSONSchema = `{
   "type": "object",
   "properties": {

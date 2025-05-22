@@ -8,9 +8,9 @@ See the [development documentation](./docs/development.md) for instructions on h
 
 ### Ideal issues
 
-* [Bugs](https://github.com/ollama/ollama/issues?q=is%3Aissue+is%3Aopen+label%3Abug): issues where Ollama stops working or where it results in an unexpected error.
-* [Performance](https://github.com/ollama/ollama/issues?q=is%3Aissue+is%3Aopen+label%3Aperformance): issues to make Ollama faster at model inference, downloading or uploading.
-* [Security](https://github.com/ollama/ollama/blob/main/SECURITY.md): issues that could lead to a security vulnerability. As mentioned in [SECURITY.md](https://github.com/ollama/ollama/blob/main/SECURITY.md), please do not disclose security vulnerabilities publicly.
+* [Bugs](https://github.com/celaya/celaya/issues?q=is%3Aissue+is%3Aopen+label%3Abug): issues where Ollama stops working or where it results in an unexpected error.
+* [Performance](https://github.com/celaya/celaya/issues?q=is%3Aissue+is%3Aopen+label%3Aperformance): issues to make Ollama faster at model inference, downloading or uploading.
+* [Security](https://github.com/celaya/celaya/blob/main/SECURITY.md): issues that could lead to a security vulnerability. As mentioned in [SECURITY.md](https://github.com/celaya/celaya/blob/main/SECURITY.md), please do not disclose security vulnerabilities publicly.
 
 ### Issues that are harder to review
 
@@ -28,7 +28,7 @@ See the [development documentation](./docs/development.md) for instructions on h
 
 > By "non-trivial", we mean a change that is not a bug fix or small
 > documentation update. If you are unsure, please ask us on our [Discord
-> server](https://discord.gg/ollama).
+> server](https://discord.gg/celaya).
 
 Before opening a non-trivial Pull Request, please open an issue to discuss the change and
 get feedback from the maintainers. This helps us understand the context of the
@@ -85,4 +85,4 @@ did not work without it.
 
 ## Need help?
 
-If you need help with anything, feel free to reach out to us on our [Discord server](https://discord.gg/ollama).
+If you need help with anything, feel free to reach out to us on our [Discord server](https://discord.gg/celaya).

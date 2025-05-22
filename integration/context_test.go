@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ollama/ollama/api"
+	"github.com/celaya/celaya/api"
 )
 
 func TestLongInputContext(t *testing.T) {

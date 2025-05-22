@@ -1,6 +1,6 @@
 // Package ollama provides a client for interacting with an Ollama registry
 // which pushes and pulls model manifests and layers as defined by the
-// [ollama.com/manifest].
+// [celayasolutions.com/manifest].
 package ollama
 
 import (
@@ -36,8 +36,8 @@ import (
 	"golang.org/x/crypto/ssh"
 	"golang.org/x/sync/errgroup"
 
-	"github.com/ollama/ollama/server/internal/cache/blob"
-	"github.com/ollama/ollama/server/internal/internal/names"
+	"github.com/celaya/celaya/server/internal/cache/blob"
+	"github.com/celaya/celaya/server/internal/internal/names"
 
 	_ "embed"
 )
@@ -167,7 +167,7 @@ func (e *Error) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-const DefaultMask = "registry.ollama.ai/library/_:latest"
+const DefaultMask = "registry.celayasolutions.com/library/_:latest"
 
 var defaultMask = func() names.Name {
 	n := names.Parse(DefaultMask)
@@ -298,7 +298,7 @@ func UserAgent() string {
 	version := buildinfo.Main.Version
 	if version == "(devel)" {
 		// When using `go run .` the version is "(devel)". This is seen
-		// as an invalid version by ollama.com and so it defaults to
+		// as an invalid version by celayasolutions.com and so it defaults to
 		// "needs upgrade" for some requests, such as pulls. These
 		// checks can be skipped by using the special version "v0.0.0",
 		// so we set it to that here.
@@ -653,7 +653,7 @@ func (r *Registry) Unlink(name string) (ok bool, _ error) {
 	return c.Unlink(n.String())
 }
 
-// Manifest represents a [ollama.com/manifest].
+// Manifest represents a [celayasolutions.com/manifest].
 type Manifest struct {
 	Name   string   `json:"-"` // the canonical name of the model
 	Data   []byte   `json:"-"` // the raw data of the manifest
@@ -712,7 +712,7 @@ func (m Manifest) MarshalJSON() ([]byte, error) {
 		// present, it will cause an error to be returned during the
 		// last phase of the commit which expects it, but does nothing
 		// with it. This will be fixed in a future release of
-		// ollama.com.
+		// celayasolutions.com.
 		Config Layer `json:"config"`
 	}{
 		M: M(m),
@@ -1033,7 +1033,7 @@ func (r *Registry) send(ctx context.Context, method, path string, body io.Reader
 // makeAuthToken creates an Ollama auth token for the given private key.
 //
 // NOTE: This format is OLD, overly complex, and should be replaced. We're
-// inheriting it from the original Ollama client and ollama.com
+// inheriting it from the original Ollama client and celayasolutions.com
 // implementations, so we need to support it for now.
 func makeAuthToken(key crypto.PrivateKey) (string, error) {
 	privKey, _ := key.(*ed25519.PrivateKey)
@@ -1041,7 +1041,7 @@ func makeAuthToken(key crypto.PrivateKey) (string, error) {
 		return "", fmt.Errorf("unsupported private key type: %T", key)
 	}
 
-	url := fmt.Sprintf("https://ollama.com?ts=%d", time.Now().Unix())
+	url := fmt.Sprintf("https://celayasolutions.com?ts=%d", time.Now().Unix())
 	// Part 1: the checkData (e.g. the URL with a timestamp)
 
 	// Part 2: the public key
@@ -1157,9 +1157,9 @@ func (r *Registry) parseNameExtended(s string) (scheme string, _ names.Name, _ b
 //
 // Examples:
 //
-//	http://ollama.com/bmizerany/smol:latest@digest
-//	https://ollama.com/bmizerany/smol:latest
-//	ollama.com/bmizerany/smol:latest@digest // returns "https" scheme.
+//	http://celayasolutions.com/bmizerany/smol:latest@digest
+//	https://celayasolutions.com/bmizerany/smol:latest
+//	celayasolutions.com/bmizerany/smol:latest@digest // returns "https" scheme.
 //	model@digest
 //	@digest
 func splitExtended(s string) (scheme, name, digest string) {

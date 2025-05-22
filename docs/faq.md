@@ -2,12 +2,12 @@
 
 ## How can I upgrade Ollama?
 
-Ollama on macOS and Windows will automatically download updates. Click on the taskbar or menubar item and then click "Restart to update" to apply the update. Updates can also be installed by downloading the latest version [manually](https://ollama.com/download/).
+Ollama on macOS and Windows will automatically download updates. Click on the taskbar or menubar item and then click "Restart to update" to apply the update. Updates can also be installed by downloading the latest version [manually](https://celaya.com/download/).
 
 On Linux, re-run the install script:
 
 ```shell
-curl -fsSL https://ollama.com/install.sh | sh
+curl -fsSL https://celaya.com/install.sh | sh
 ```
 
 ## How can I view the logs?
@@ -25,10 +25,10 @@ By default, Ollama uses a context window size of 4096 tokens.
 This can be overridden with the `OLLAMA_CONTEXT_LENGTH` environment variable. For example, to set the default context window to 8K, use: 
 
 ```shell
-OLLAMA_CONTEXT_LENGTH=8192 ollama serve
+OLLAMA_CONTEXT_LENGTH=8192 celaya serve
 ```
 
-To change this when using `ollama run`, use `/set parameter`:
+To change this when using `celaya run`, use `/set parameter`:
 
 ```shell
 /set parameter num_ctx 4096
@@ -48,10 +48,10 @@ curl http://localhost:11434/api/generate -d '{
 
 ## How can I tell if my model was loaded onto the GPU?
 
-Use the `ollama ps` command to see what models are currently loaded into memory.
+Use the `celaya ps` command to see what models are currently loaded into memory.
 
 ```shell
-ollama ps
+celaya ps
 ```
 
 > **Output**:
@@ -86,7 +86,7 @@ If Ollama is run as a macOS application, environment variables should be set usi
 
 If Ollama is run as a systemd service, environment variables should be set using `systemctl`:
 
-1. Edit the systemd service by calling `systemctl edit ollama.service`. This will open an editor.
+1. Edit the systemd service by calling `systemctl edit celaya.service`. This will open an editor.
 
 2. For each environment variable, add a line `Environment` under section `[Service]`:
 
@@ -101,7 +101,7 @@ If Ollama is run as a systemd service, environment variables should be set using
 
    ```shell
    systemctl daemon-reload
-   systemctl restart ollama
+   systemctl restart celaya
    ```
 
 ### Setting environment variables on Windows
@@ -136,7 +136,7 @@ Alternatively, the Docker daemon can be configured to use a proxy. Instructions 
 Ensure the certificate is installed as a system certificate when using HTTPS. This may require a new Docker image when using a self-signed certificate.
 
 ```dockerfile
-FROM ollama/ollama
+FROM celaya/celaya
 COPY my-ca.pem /usr/local/share/ca-certificates/my-ca.crt
 RUN update-ca-certificates
 ```
@@ -144,11 +144,11 @@ RUN update-ca-certificates
 Build and run this image:
 
 ```shell
-docker build -t ollama-with-ca .
-docker run -d -e HTTPS_PROXY=https://my.proxy.example.com -p 11434:11434 ollama-with-ca
+docker build -t celaya-with-ca .
+docker run -d -e HTTPS_PROXY=https://my.proxy.example.com -p 11434:11434 celaya-with-ca
 ```
 
-## Does Ollama send my prompts and answers back to ollama.com?
+## Does Ollama send my prompts and answers back to celaya.com?
 
 No. Ollama runs locally, and conversation data does not leave your machine.
 
@@ -156,7 +156,7 @@ No. Ollama runs locally, and conversation data does not leave your machine.
 
 Ollama binds 127.0.0.1 port 11434 by default. Change the bind address with the `OLLAMA_HOST` environment variable.
 
-Refer to the section [above](#how-do-i-configure-ollama-server) for how to set environment variables on your platform.
+Refer to the section [above](#how-do-i-configure-celaya-server) for how to set environment variables on your platform.
 
 ## How can I use Ollama with a proxy server?
 
@@ -197,32 +197,32 @@ For browser extensions, you'll need to explicitly allow the extension's origin p
 
 ```
 # Allow all Chrome, Firefox, and Safari extensions
-OLLAMA_ORIGINS=chrome-extension://*,moz-extension://*,safari-web-extension://* ollama serve
+OLLAMA_ORIGINS=chrome-extension://*,moz-extension://*,safari-web-extension://* celaya serve
 ```
 
-Refer to the section [above](#how-do-i-configure-ollama-server) for how to set environment variables on your platform.
+Refer to the section [above](#how-do-i-configure-celaya-server) for how to set environment variables on your platform.
 
 ## Where are models stored?
 
-- macOS: `~/.ollama/models`
-- Linux: `/usr/share/ollama/.ollama/models`
-- Windows: `C:\Users\%username%\.ollama\models`
+- macOS: `~/.celaya/models`
+- Linux: `/usr/share/celaya/.celaya/models`
+- Windows: `C:\Users\%username%\.celaya\models`
 
 ### How do I set them to a different location?
 
 If a different directory needs to be used, set the environment variable `OLLAMA_MODELS` to the chosen directory.
 
-> Note: on Linux using the standard installer, the `ollama` user needs read and write access to the specified directory. To assign the directory to the `ollama` user run `sudo chown -R ollama:ollama <directory>`.
+> Note: on Linux using the standard installer, the `celaya` user needs read and write access to the specified directory. To assign the directory to the `celaya` user run `sudo chown -R celaya:celaya <directory>`.
 
-Refer to the section [above](#how-do-i-configure-ollama-server) for how to set environment variables on your platform.
+Refer to the section [above](#how-do-i-configure-celaya-server) for how to set environment variables on your platform.
 
 ## How can I use Ollama in Visual Studio Code?
 
-There is already a large collection of plugins available for VSCode as well as other editors that leverage Ollama. See the list of [extensions & plugins](https://github.com/ollama/ollama#extensions--plugins) at the bottom of the main repository readme.
+There is already a large collection of plugins available for VSCode as well as other editors that leverage Ollama. See the list of [extensions & plugins](https://github.com/celaya/celaya#extensions--plugins) at the bottom of the main repository readme.
 
 ## How do I use Ollama with GPU acceleration in Docker?
 
-The Ollama Docker container can be configured with GPU acceleration in Linux or Windows (with WSL2). This requires the [nvidia-container-toolkit](https://github.com/NVIDIA/nvidia-container-toolkit). See [ollama/ollama](https://hub.docker.com/r/ollama/ollama) for more details.
+The Ollama Docker container can be configured with GPU acceleration in Linux or Windows (with WSL2). This requires the [nvidia-container-toolkit](https://github.com/NVIDIA/nvidia-container-toolkit). See [celaya/celaya](https://hub.docker.com/r/celaya/celaya) for more details.
 
 GPU acceleration is not available for Docker Desktop in macOS due to the lack of GPU passthrough and emulation.
 
@@ -253,15 +253,15 @@ curl http://localhost:11434/api/chat -d '{"model": "mistral"}'
 To preload a model using the CLI, use the command:
 
 ```shell
-ollama run llama3.2 ""
+celaya run llama3.2 ""
 ```
 
 ## How do I keep a model loaded in memory or make it unload immediately?
 
-By default models are kept in memory for 5 minutes before being unloaded. This allows for quicker response times if you're making numerous requests to the LLM. If you want to immediately unload a model from memory, use the `ollama stop` command:
+By default models are kept in memory for 5 minutes before being unloaded. This allows for quicker response times if you're making numerous requests to the LLM. If you want to immediately unload a model from memory, use the `celaya stop` command:
 
 ```shell
-ollama stop llama3.2
+celaya stop llama3.2
 ```
 
 If you're using the API, use the `keep_alive` parameter with the `/api/generate` and `/api/chat` endpoints to set the amount of time that a model stays in memory. The `keep_alive` parameter can be set to:
@@ -282,7 +282,7 @@ To unload the model and free up memory use:
 curl http://localhost:11434/api/generate -d '{"model": "llama3.2", "keep_alive": 0}'
 ```
 
-Alternatively, you can change the amount of time all models are loaded into memory by setting the `OLLAMA_KEEP_ALIVE` environment variable when starting the Ollama server. The `OLLAMA_KEEP_ALIVE` variable uses the same parameter types as the `keep_alive` parameter types mentioned above. Refer to the section explaining [how to configure the Ollama server](#how-do-i-configure-ollama-server) to correctly set the environment variable.
+Alternatively, you can change the amount of time all models are loaded into memory by setting the `OLLAMA_KEEP_ALIVE` environment variable when starting the Ollama server. The `OLLAMA_KEEP_ALIVE` variable uses the same parameter types as the `keep_alive` parameter types mentioned above. Refer to the section explaining [how to configure the Ollama server](#how-do-i-configure-celaya-server) to correctly set the environment variable.
 
 The `keep_alive` API parameter with the `/api/generate` and `/api/chat` API endpoints will override the `OLLAMA_KEEP_ALIVE` setting.
 

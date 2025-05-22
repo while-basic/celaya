@@ -4,12 +4,12 @@ import (
 	"math"
 	"slices"
 
-	"github.com/ollama/ollama/fs"
-	"github.com/ollama/ollama/kvcache"
-	"github.com/ollama/ollama/ml"
-	"github.com/ollama/ollama/ml/nn"
-	"github.com/ollama/ollama/ml/nn/fast"
-	"github.com/ollama/ollama/ml/nn/rope"
+	"github.com/celaya/celaya/fs"
+	"github.com/celaya/celaya/kvcache"
+	"github.com/celaya/celaya/ml"
+	"github.com/celaya/celaya/ml/nn"
+	"github.com/celaya/celaya/ml/nn/fast"
+	"github.com/celaya/celaya/ml/nn/rope"
 )
 
 type TextSelfAttention struct {

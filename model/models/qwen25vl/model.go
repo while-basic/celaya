@@ -6,11 +6,11 @@ import (
 	"image"
 	"slices"
 
-	"github.com/ollama/ollama/fs"
-	"github.com/ollama/ollama/kvcache"
-	"github.com/ollama/ollama/ml"
-	"github.com/ollama/ollama/model"
-	"github.com/ollama/ollama/model/input"
+	"github.com/celaya/celaya/fs"
+	"github.com/celaya/celaya/kvcache"
+	"github.com/celaya/celaya/ml"
+	"github.com/celaya/celaya/model"
+	"github.com/celaya/celaya/model/input"
 )
 
 type Model struct {

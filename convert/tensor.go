@@ -5,7 +5,7 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/ollama/ollama/fs/ggml"
+	"github.com/celaya/celaya/fs/ggml"
 	"github.com/pdevine/tensor"
 	"github.com/pdevine/tensor/native"
 )

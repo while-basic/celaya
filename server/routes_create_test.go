@@ -17,9 +17,9 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/ollama/ollama/api"
-	"github.com/ollama/ollama/envconfig"
-	"github.com/ollama/ollama/fs/ggml"
+	"github.com/celaya/celaya/api"
+	"github.com/celaya/celaya/envconfig"
+	"github.com/celaya/celaya/fs/ggml"
 )
 
 var stream bool = false
@@ -127,7 +127,7 @@ func TestCreateFromBin(t *testing.T) {
 	}
 
 	checkFileExists(t, filepath.Join(p, "manifests", "*", "*", "*", "*"), []string{
-		filepath.Join(p, "manifests", "registry.ollama.ai", "library", "test", "latest"),
+		filepath.Join(p, "manifests", "registry.celayasolutions.com", "library", "test", "latest"),
 	})
 
 	checkFileExists(t, filepath.Join(p, "blobs", "*"), []string{
@@ -156,7 +156,7 @@ func TestCreateFromModel(t *testing.T) {
 	}
 
 	checkFileExists(t, filepath.Join(p, "manifests", "*", "*", "*", "*"), []string{
-		filepath.Join(p, "manifests", "registry.ollama.ai", "library", "test", "latest"),
+		filepath.Join(p, "manifests", "registry.celayasolutions.com", "library", "test", "latest"),
 	})
 
 	w = createRequest(t, s.CreateHandler, api.CreateRequest{
@@ -170,8 +170,8 @@ func TestCreateFromModel(t *testing.T) {
 	}
 
 	checkFileExists(t, filepath.Join(p, "manifests", "*", "*", "*", "*"), []string{
-		filepath.Join(p, "manifests", "registry.ollama.ai", "library", "test", "latest"),
-		filepath.Join(p, "manifests", "registry.ollama.ai", "library", "test2", "latest"),
+		filepath.Join(p, "manifests", "registry.celayasolutions.com", "library", "test", "latest"),
+		filepath.Join(p, "manifests", "registry.celayasolutions.com", "library", "test2", "latest"),
 	})
 
 	checkFileExists(t, filepath.Join(p, "blobs", "*"), []string{
@@ -200,7 +200,7 @@ func TestCreateRemovesLayers(t *testing.T) {
 	}
 
 	checkFileExists(t, filepath.Join(p, "manifests", "*", "*", "*", "*"), []string{
-		filepath.Join(p, "manifests", "registry.ollama.ai", "library", "test", "latest"),
+		filepath.Join(p, "manifests", "registry.celayasolutions.com", "library", "test", "latest"),
 	})
 
 	checkFileExists(t, filepath.Join(p, "blobs", "*"), []string{
@@ -221,7 +221,7 @@ func TestCreateRemovesLayers(t *testing.T) {
 	}
 
 	checkFileExists(t, filepath.Join(p, "manifests", "*", "*", "*", "*"), []string{
-		filepath.Join(p, "manifests", "registry.ollama.ai", "library", "test", "latest"),
+		filepath.Join(p, "manifests", "registry.celayasolutions.com", "library", "test", "latest"),
 	})
 
 	checkFileExists(t, filepath.Join(p, "blobs", "*"), []string{
@@ -251,7 +251,7 @@ func TestCreateUnsetsSystem(t *testing.T) {
 	}
 
 	checkFileExists(t, filepath.Join(p, "manifests", "*", "*", "*", "*"), []string{
-		filepath.Join(p, "manifests", "registry.ollama.ai", "library", "test", "latest"),
+		filepath.Join(p, "manifests", "registry.celayasolutions.com", "library", "test", "latest"),
 	})
 
 	checkFileExists(t, filepath.Join(p, "blobs", "*"), []string{
@@ -272,7 +272,7 @@ func TestCreateUnsetsSystem(t *testing.T) {
 	}
 
 	checkFileExists(t, filepath.Join(p, "manifests", "*", "*", "*", "*"), []string{
-		filepath.Join(p, "manifests", "registry.ollama.ai", "library", "test", "latest"),
+		filepath.Join(p, "manifests", "registry.celayasolutions.com", "library", "test", "latest"),
 	})
 
 	checkFileExists(t, filepath.Join(p, "blobs", "*"), []string{
@@ -305,7 +305,7 @@ func TestCreateMergeParameters(t *testing.T) {
 	}
 
 	checkFileExists(t, filepath.Join(p, "manifests", "*", "*", "*", "*"), []string{
-		filepath.Join(p, "manifests", "registry.ollama.ai", "library", "test", "latest"),
+		filepath.Join(p, "manifests", "registry.celayasolutions.com", "library", "test", "latest"),
 	})
 
 	checkFileExists(t, filepath.Join(p, "blobs", "*"), []string{
@@ -330,8 +330,8 @@ func TestCreateMergeParameters(t *testing.T) {
 	}
 
 	checkFileExists(t, filepath.Join(p, "manifests", "*", "*", "*", "*"), []string{
-		filepath.Join(p, "manifests", "registry.ollama.ai", "library", "test", "latest"),
-		filepath.Join(p, "manifests", "registry.ollama.ai", "library", "test2", "latest"),
+		filepath.Join(p, "manifests", "registry.celayasolutions.com", "library", "test", "latest"),
+		filepath.Join(p, "manifests", "registry.celayasolutions.com", "library", "test2", "latest"),
 	})
 
 	// Display contents of each blob in the directory
@@ -389,8 +389,8 @@ func TestCreateMergeParameters(t *testing.T) {
 	}
 
 	checkFileExists(t, filepath.Join(p, "manifests", "*", "*", "*", "*"), []string{
-		filepath.Join(p, "manifests", "registry.ollama.ai", "library", "test", "latest"),
-		filepath.Join(p, "manifests", "registry.ollama.ai", "library", "test2", "latest"),
+		filepath.Join(p, "manifests", "registry.celayasolutions.com", "library", "test", "latest"),
+		filepath.Join(p, "manifests", "registry.celayasolutions.com", "library", "test2", "latest"),
 	})
 
 	checkFileExists(t, filepath.Join(p, "blobs", "*"), []string{
@@ -449,7 +449,7 @@ func TestCreateReplacesMessages(t *testing.T) {
 	}
 
 	checkFileExists(t, filepath.Join(p, "manifests", "*", "*", "*", "*"), []string{
-		filepath.Join(p, "manifests", "registry.ollama.ai", "library", "test", "latest"),
+		filepath.Join(p, "manifests", "registry.celayasolutions.com", "library", "test", "latest"),
 	})
 
 	checkFileExists(t, filepath.Join(p, "blobs", "*"), []string{
@@ -483,8 +483,8 @@ func TestCreateReplacesMessages(t *testing.T) {
 	}
 
 	checkFileExists(t, filepath.Join(p, "manifests", "*", "*", "*", "*"), []string{
-		filepath.Join(p, "manifests", "registry.ollama.ai", "library", "test", "latest"),
-		filepath.Join(p, "manifests", "registry.ollama.ai", "library", "test2", "latest"),
+		filepath.Join(p, "manifests", "registry.celayasolutions.com", "library", "test", "latest"),
+		filepath.Join(p, "manifests", "registry.celayasolutions.com", "library", "test2", "latest"),
 	})
 
 	// Old layers will not have been pruned
@@ -544,7 +544,7 @@ func TestCreateTemplateSystem(t *testing.T) {
 	}
 
 	checkFileExists(t, filepath.Join(p, "manifests", "*", "*", "*", "*"), []string{
-		filepath.Join(p, "manifests", "registry.ollama.ai", "library", "test", "latest"),
+		filepath.Join(p, "manifests", "registry.celayasolutions.com", "library", "test", "latest"),
 	})
 
 	checkFileExists(t, filepath.Join(p, "blobs", "*"), []string{
@@ -635,7 +635,7 @@ func TestCreateLicenses(t *testing.T) {
 	}
 
 	checkFileExists(t, filepath.Join(p, "manifests", "*", "*", "*", "*"), []string{
-		filepath.Join(p, "manifests", "registry.ollama.ai", "library", "test", "latest"),
+		filepath.Join(p, "manifests", "registry.celayasolutions.com", "library", "test", "latest"),
 	})
 
 	checkFileExists(t, filepath.Join(p, "blobs", "*"), []string{

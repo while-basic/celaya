@@ -7,8 +7,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/ollama/ollama/envconfig"
-	"github.com/ollama/ollama/logutil"
+	"github.com/celaya/celaya/envconfig"
+	"github.com/celaya/celaya/logutil"
 )
 
 func InitLogging() {

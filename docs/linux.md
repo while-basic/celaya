@@ -5,31 +5,31 @@
 To install Ollama, run the following command:
 
 ```shell
-curl -fsSL https://ollama.com/install.sh | sh
+curl -fsSL https://celaya.com/install.sh | sh
 ```
 
 ## Manual install
 
 > [!NOTE]
-> If you are upgrading from a prior version, you should remove the old libraries with `sudo rm -rf /usr/lib/ollama` first.
+> If you are upgrading from a prior version, you should remove the old libraries with `sudo rm -rf /usr/lib/celaya` first.
 
 Download and extract the package:
 
 ```shell
-curl -L https://ollama.com/download/ollama-linux-amd64.tgz -o ollama-linux-amd64.tgz
-sudo tar -C /usr -xzf ollama-linux-amd64.tgz
+curl -L https://celaya.com/download/celaya-linux-amd64.tgz -o celaya-linux-amd64.tgz
+sudo tar -C /usr -xzf celaya-linux-amd64.tgz
 ```
 
 Start Ollama:
 
 ```shell
-ollama serve
+celaya serve
 ```
 
 In another terminal, verify that Ollama is running:
 
 ```shell
-ollama -v
+celaya -v
 ```
 
 ### AMD GPU install
@@ -37,8 +37,8 @@ ollama -v
 If you have an AMD GPU, also download and extract the additional ROCm package:
 
 ```shell
-curl -L https://ollama.com/download/ollama-linux-amd64-rocm.tgz -o ollama-linux-amd64-rocm.tgz
-sudo tar -C /usr -xzf ollama-linux-amd64-rocm.tgz
+curl -L https://celaya.com/download/celaya-linux-amd64-rocm.tgz -o celaya-linux-amd64-rocm.tgz
+sudo tar -C /usr -xzf celaya-linux-amd64-rocm.tgz
 ```
 
 ### ARM64 install
@@ -46,8 +46,8 @@ sudo tar -C /usr -xzf ollama-linux-amd64-rocm.tgz
 Download and extract the ARM64-specific package:
 
 ```shell
-curl -L https://ollama.com/download/ollama-linux-arm64.tgz -o ollama-linux-arm64.tgz
-sudo tar -C /usr -xzf ollama-linux-arm64.tgz
+curl -L https://celaya.com/download/celaya-linux-arm64.tgz -o celaya-linux-arm64.tgz
+sudo tar -C /usr -xzf celaya-linux-arm64.tgz
 ```
 
 ### Adding Ollama as a startup service (recommended)
@@ -55,11 +55,11 @@ sudo tar -C /usr -xzf ollama-linux-arm64.tgz
 Create a user and group for Ollama:
 
 ```shell
-sudo useradd -r -s /bin/false -U -m -d /usr/share/ollama ollama
-sudo usermod -a -G ollama $(whoami)
+sudo useradd -r -s /bin/false -U -m -d /usr/share/celaya celaya
+sudo usermod -a -G celaya $(whoami)
 ```
 
-Create a service file in `/etc/systemd/system/ollama.service`:
+Create a service file in `/etc/systemd/system/celaya.service`:
 
 ```ini
 [Unit]
@@ -67,9 +67,9 @@ Description=Ollama Service
 After=network-online.target
 
 [Service]
-ExecStart=/usr/bin/ollama serve
-User=ollama
-Group=ollama
+ExecStart=/usr/bin/celaya serve
+User=celaya
+Group=celaya
 Restart=always
 RestartSec=3
 Environment="PATH=$PATH"
@@ -82,7 +82,7 @@ Then start the service:
 
 ```shell
 sudo systemctl daemon-reload
-sudo systemctl enable ollama
+sudo systemctl enable celaya
 ```
 
 ### Install CUDA drivers (optional)
@@ -104,8 +104,8 @@ nvidia-smi
 Start Ollama and verify it is running:
 
 ```shell
-sudo systemctl start ollama
-sudo systemctl status ollama
+sudo systemctl start celaya
+sudo systemctl status celaya
 ```
 
 > [!NOTE]
@@ -120,10 +120,10 @@ sudo systemctl status ollama
 To customize the installation of Ollama, you can edit the systemd service file or the environment variables by running:
 
 ```shell
-sudo systemctl edit ollama
+sudo systemctl edit celaya
 ```
 
-Alternatively, create an override file manually in `/etc/systemd/system/ollama.service.d/override.conf`:
+Alternatively, create an override file manually in `/etc/systemd/system/celaya.service.d/override.conf`:
 
 ```ini
 [Service]
@@ -135,24 +135,24 @@ Environment="OLLAMA_DEBUG=1"
 Update Ollama by running the install script again:
 
 ```shell
-curl -fsSL https://ollama.com/install.sh | sh
+curl -fsSL https://celaya.com/install.sh | sh
 ```
 
 Or by re-downloading Ollama:
 
 ```shell
-curl -L https://ollama.com/download/ollama-linux-amd64.tgz -o ollama-linux-amd64.tgz
-sudo tar -C /usr -xzf ollama-linux-amd64.tgz
+curl -L https://celaya.com/download/celaya-linux-amd64.tgz -o celaya-linux-amd64.tgz
+sudo tar -C /usr -xzf celaya-linux-amd64.tgz
 ```
 
 ## Installing specific versions
 
-Use `OLLAMA_VERSION` environment variable with the install script to install a specific version of Ollama, including pre-releases. You can find the version numbers in the [releases page](https://github.com/ollama/ollama/releases).
+Use `OLLAMA_VERSION` environment variable with the install script to install a specific version of Ollama, including pre-releases. You can find the version numbers in the [releases page](https://github.com/celaya/celaya/releases).
 
 For example:
 
 ```shell
-curl -fsSL https://ollama.com/install.sh | OLLAMA_VERSION=0.5.7 sh
+curl -fsSL https://celaya.com/install.sh | OLLAMA_VERSION=0.5.7 sh
 ```
 
 ## Viewing logs
@@ -160,35 +160,35 @@ curl -fsSL https://ollama.com/install.sh | OLLAMA_VERSION=0.5.7 sh
 To view logs of Ollama running as a startup service, run:
 
 ```shell
-journalctl -e -u ollama
+journalctl -e -u celaya
 ```
 
 ## Uninstall
 
-Remove the ollama service:
+Remove the celaya service:
 
 ```shell
-sudo systemctl stop ollama
-sudo systemctl disable ollama
-sudo rm /etc/systemd/system/ollama.service
+sudo systemctl stop celaya
+sudo systemctl disable celaya
+sudo rm /etc/systemd/system/celaya.service
 ```
 
-Remove the ollama binary from your bin directory (either `/usr/local/bin`, `/usr/bin`, or `/bin`):
+Remove the celaya binary from your bin directory (either `/usr/local/bin`, `/usr/bin`, or `/bin`):
 
 ```shell
-sudo rm $(which ollama)
+sudo rm $(which celaya)
 ```
 
 Remove the downloaded models and Ollama service user and group:
 
 ```shell
-sudo rm -r /usr/share/ollama
-sudo userdel ollama
-sudo groupdel ollama
+sudo rm -r /usr/share/celaya
+sudo userdel celaya
+sudo groupdel celaya
 ```
 
 Remove installed libraries:
 
 ```shell
-sudo rm -rf /usr/local/lib/ollama
+sudo rm -rf /usr/local/lib/celaya
 ```

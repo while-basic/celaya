@@ -23,12 +23,12 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/go-cmp/cmp"
-	"github.com/ollama/ollama/api"
-	"github.com/ollama/ollama/fs/ggml"
-	"github.com/ollama/ollama/openai"
-	"github.com/ollama/ollama/server/internal/client/ollama"
-	"github.com/ollama/ollama/types/model"
-	"github.com/ollama/ollama/version"
+	"github.com/celaya/celaya/api"
+	"github.com/celaya/celaya/fs/ggml"
+	"github.com/celaya/celaya/openai"
+	"github.com/celaya/celaya/server/internal/client/ollama"
+	"github.com/celaya/celaya/types/model"
+	"github.com/celaya/celaya/version"
 )
 
 func createTestFile(t *testing.T, name string) (string, string) {
@@ -504,11 +504,11 @@ func TestRoutes(t *testing.T) {
 
 	rc := &ollama.Registry{
 		// This is a temporary measure to allow us to move forward,
-		// surfacing any code contacting ollama.com we do not intended
+		// surfacing any code contacting celayasolutions.com we do not intended
 		// to.
 		//
 		// Currently, this only handles DELETE /api/delete, which
-		// should not make any contact with the ollama.com registry, so
+		// should not make any contact with the celayasolutions.com registry, so
 		// be clear about that.
 		//
 		// Tests that do need to contact the registry here, will be
@@ -855,7 +855,7 @@ func TestFilterThinkTags(t *testing.T) {
 				{Role: "user", Content: "What is the answer?"},
 			},
 			model: &Model{
-				Name:      "registry.ollama.ai/library/deepseek-r1:latest",
+				Name:      "registry.celayasolutions.com/library/deepseek-r1:latest",
 				ShortName: "deepseek-r1:7b",
 				Config:    ConfigV2{},
 			},

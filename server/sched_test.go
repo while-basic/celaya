@@ -11,12 +11,12 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/ollama/ollama/api"
-	"github.com/ollama/ollama/app/lifecycle"
-	"github.com/ollama/ollama/discover"
-	"github.com/ollama/ollama/format"
-	"github.com/ollama/ollama/fs/ggml"
-	"github.com/ollama/ollama/llm"
+	"github.com/celaya/celaya/api"
+	"github.com/celaya/celaya/app/lifecycle"
+	"github.com/celaya/celaya/discover"
+	"github.com/celaya/celaya/format"
+	"github.com/celaya/celaya/fs/ggml"
+	"github.com/celaya/celaya/llm"
 )
 
 func TestMain(m *testing.M) {

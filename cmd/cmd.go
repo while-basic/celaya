@@ -34,16 +34,16 @@ import (
 	"golang.org/x/sync/errgroup"
 	"golang.org/x/term"
 
-	"github.com/ollama/ollama/api"
-	"github.com/ollama/ollama/envconfig"
-	"github.com/ollama/ollama/format"
-	"github.com/ollama/ollama/parser"
-	"github.com/ollama/ollama/progress"
-	"github.com/ollama/ollama/runner"
-	"github.com/ollama/ollama/server"
-	"github.com/ollama/ollama/types/model"
-	"github.com/ollama/ollama/types/syncmap"
-	"github.com/ollama/ollama/version"
+	"github.com/celaya/celaya/api"
+	"github.com/celaya/celaya/envconfig"
+	"github.com/celaya/celaya/format"
+	"github.com/celaya/celaya/parser"
+	"github.com/celaya/celaya/progress"
+	"github.com/celaya/celaya/runner"
+	"github.com/celaya/celaya/server"
+	"github.com/celaya/celaya/types/model"
+	"github.com/celaya/celaya/types/syncmap"
+	"github.com/celaya/celaya/version"
 )
 
 var errModelfileNotFound = errors.New("specified Modelfile wasn't found")
@@ -463,8 +463,8 @@ func PushHandler(cmd *cobra.Command, args []string) error {
 	spinner.Stop()
 
 	destination := n.String()
-	if strings.HasSuffix(n.Host, ".ollama.ai") || strings.HasSuffix(n.Host, ".ollama.com") {
-		destination = "https://ollama.com/" + strings.TrimSuffix(n.DisplayShortest(), ":latest")
+	if strings.HasSuffix(n.Host, ".celayasolutions.com") || strings.HasSuffix(n.Host, ".celayasolutions.com") {
+		destination = "https://celayasolutions.com/" + strings.TrimSuffix(n.DisplayShortest(), ":latest")
 	}
 	fmt.Printf("\nYou can find your model at:\n\n")
 	fmt.Printf("\t%s\n", destination)
@@ -1290,7 +1290,7 @@ func NewCLI() *cobra.Command {
 	}
 
 	rootCmd := &cobra.Command{
-		Use:           "ollama",
+		Use:           "celaya",
 		Short:         "Large language model runner",
 		SilenceUsage:  true,
 		SilenceErrors: true,
@@ -1360,7 +1360,7 @@ func NewCLI() *cobra.Command {
 	serveCmd := &cobra.Command{
 		Use:     "serve",
 		Aliases: []string{"start"},
-		Short:   "Start ollama",
+		Short:   "Start celaya",
 		Args:    cobra.ExactArgs(0),
 		RunE:    RunServer,
 	}
@@ -1430,7 +1430,7 @@ func NewCLI() *cobra.Command {
 
 	envVars := envconfig.AsMap()
 
-	envs := []envconfig.EnvVar{envVars["OLLAMA_HOST"]}
+	envs := []envconfig.EnvVar{envVars["CELAYA_HOST"]}
 
 	for _, cmd := range []*cobra.Command{
 		createCmd,
@@ -1447,24 +1447,24 @@ func NewCLI() *cobra.Command {
 	} {
 		switch cmd {
 		case runCmd:
-			appendEnvDocs(cmd, []envconfig.EnvVar{envVars["OLLAMA_HOST"], envVars["OLLAMA_NOHISTORY"]})
+			appendEnvDocs(cmd, []envconfig.EnvVar{envVars["CELAYA_HOST"], envVars["CELAYA_NOHISTORY"]})
 		case serveCmd:
 			appendEnvDocs(cmd, []envconfig.EnvVar{
-				envVars["OLLAMA_DEBUG"],
-				envVars["OLLAMA_HOST"],
-				envVars["OLLAMA_KEEP_ALIVE"],
-				envVars["OLLAMA_MAX_LOADED_MODELS"],
-				envVars["OLLAMA_MAX_QUEUE"],
-				envVars["OLLAMA_MODELS"],
-				envVars["OLLAMA_NUM_PARALLEL"],
-				envVars["OLLAMA_NOPRUNE"],
-				envVars["OLLAMA_ORIGINS"],
-				envVars["OLLAMA_SCHED_SPREAD"],
-				envVars["OLLAMA_FLASH_ATTENTION"],
-				envVars["OLLAMA_KV_CACHE_TYPE"],
-				envVars["OLLAMA_LLM_LIBRARY"],
-				envVars["OLLAMA_GPU_OVERHEAD"],
-				envVars["OLLAMA_LOAD_TIMEOUT"],
+				envVars["CELAYA_DEBUG"],
+				envVars["CELAYA_HOST"],
+				envVars["CELAYA_KEEP_ALIVE"],
+				envVars["CELAYA_MAX_LOADED_MODELS"],
+				envVars["CELAYA_MAX_QUEUE"],
+				envVars["CELAYA_MODELS"],
+				envVars["CELAYA_NUM_PARALLEL"],
+				envVars["CELAYA_NOPRUNE"],
+				envVars["CELAYA_ORIGINS"],
+				envVars["CELAYA_SCHED_SPREAD"],
+				envVars["CELAYA_FLASH_ATTENTION"],
+				envVars["CELAYA_KV_CACHE_TYPE"],
+				envVars["CELAYA_LLM_LIBRARY"],
+				envVars["CELAYA_GPU_OVERHEAD"],
+				envVars["CELAYA_LOAD_TIMEOUT"],
 			})
 		default:
 			appendEnvDocs(cmd, envs)

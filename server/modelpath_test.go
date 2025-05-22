@@ -1,6 +1,71 @@
 package server
 
-import "testing"
+import (
+	"path/filepath"
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+)
+
+func TestGetBlobsPath(t *testing.T) {
+	// GetBlobsPath expects an actual directory to exist
+	tempDir := t.TempDir()
+
+	tests := []struct {
+		name     string
+		digest   string
+		expected string
+		err      error
+	}{
+		{
+			"empty digest",
+			"",
+			filepath.Join(tempDir, "blobs"),
+			nil,
+		},
+		{
+			"valid with colon",
+			"sha256:456402914e838a953e0cf80caa6adbe75383d9e63584a964f504a7bbb8f7aad9",
+			filepath.Join(tempDir, "blobs", "sha256-456402914e838a953e0cf80caa6adbe75383d9e63584a964f504a7bbb8f7aad9"),
+			nil,
+		},
+		{
+			"valid with dash",
+			"sha256-456402914e838a953e0cf80caa6adbe75383d9e63584a964f504a7bbb8f7aad9",
+			filepath.Join(tempDir, "blobs", "sha256-456402914e838a953e0cf80caa6adbe75383d9e63584a964f504a7bbb8f7aad9"),
+			nil,
+		},
+		{
+			"digest too short",
+			"sha256-45640291",
+			"",
+			ErrInvalidDigestFormat,
+		},
+		{
+			"digest too long",
+			"sha256-456402914e838a953e0cf80caa6adbe75383d9e63584a964f504a7bbb8f7aad9aaaaaaaaaa",
+			"",
+			ErrInvalidDigestFormat,
+		},
+		{
+			"digest invalid chars",
+			"../sha256-456402914e838a953e0cf80caa6adbe75383d9e63584a964f504a7bbb8f7a",
+			"",
+			ErrInvalidDigestFormat,
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Setenv("OLLAMA_MODELS", tempDir)
+
+			got, err := GetBlobsPath(tc.digest)
+
+			require.ErrorIs(t, tc.err, err, tc.name)
+			assert.Equal(t, tc.expected, got, tc.name)
+		})
+	}
+}
 
 func TestParseModelPath(t *testing.T) {
 	tests := []struct {

@@ -15,36 +15,24 @@ import (
 	"path"
 	"path/filepath"
 	"runtime"
+	"strconv"
 	"strings"
 	"time"
 
-	"github.com/jmorganca/ollama/auth"
-	"github.com/jmorganca/ollama/version"
+	"github.com/ollama/ollama/auth"
+	"github.com/ollama/ollama/version"
 )
 
 var (
-	UpdateCheckURLBase = "https://ollama.com/api/update"
-	UpdateDownloaded   = false
+	UpdateCheckURLBase  = "https://ollama.com/api/update"
+	UpdateDownloaded    = false
+	UpdateCheckInterval = 60 * 60 * time.Second
 )
 
 // TODO - maybe move up to the API package?
 type UpdateResponse struct {
 	UpdateURL     string `json:"url"`
 	UpdateVersion string `json:"version"`
-}
-
-func getClient(req *http.Request) http.Client {
-	proxyURL, err := http.ProxyFromEnvironment(req)
-	if err != nil {
-		slog.Warn(fmt.Sprintf("failed to handle proxy: %s", err))
-		return http.Client{}
-	}
-
-	return http.Client{
-		Transport: &http.Transport{
-			Proxy: http.ProxyURL(proxyURL),
-		},
-	}
 }
 
 func IsNewReleaseAvailable(ctx context.Context) (bool, UpdateResponse) {
@@ -59,7 +47,7 @@ func IsNewReleaseAvailable(ctx context.Context) (bool, UpdateResponse) {
 	query.Add("os", runtime.GOOS)
 	query.Add("arch", runtime.GOARCH)
 	query.Add("version", version.Version)
-	query.Add("ts", fmt.Sprintf("%d", time.Now().Unix()))
+	query.Add("ts", strconv.FormatInt(time.Now().Unix(), 10))
 
 	nonce, err := auth.NewNonce(rand.Reader, 16)
 	if err != nil {
@@ -82,23 +70,27 @@ func IsNewReleaseAvailable(ctx context.Context) (bool, UpdateResponse) {
 	}
 	req.Header.Set("Authorization", signature)
 	req.Header.Set("User-Agent", fmt.Sprintf("ollama/%s (%s %s) Go/%s", version.Version, runtime.GOARCH, runtime.GOOS, runtime.Version()))
-	client := getClient(req)
 
 	slog.Debug("checking for available update", "requestURL", requestURL)
-	resp, err := client.Do(req)
+	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		slog.Warn(fmt.Sprintf("failed to check for update: %s", err))
 		return false, updateResp
 	}
 	defer resp.Body.Close()
 
-	if resp.StatusCode == 204 {
+	if resp.StatusCode == http.StatusNoContent {
 		slog.Debug("check update response 204 (current version is up to date)")
 		return false, updateResp
 	}
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		slog.Warn(fmt.Sprintf("failed to read body response: %s", err))
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		slog.Info(fmt.Sprintf("check update error %d - %.96s", resp.StatusCode, string(body)))
+		return false, updateResp
 	}
 	err = json.Unmarshal(body, &updateResp)
 	if err != nil {
@@ -112,19 +104,18 @@ func IsNewReleaseAvailable(ctx context.Context) (bool, UpdateResponse) {
 	return true, updateResp
 }
 
-// Returns true if we downloaded a new update, false if we already had it
 func DownloadNewRelease(ctx context.Context, updateResp UpdateResponse) error {
 	// Do a head first to check etag info
 	req, err := http.NewRequestWithContext(ctx, http.MethodHead, updateResp.UpdateURL, nil)
 	if err != nil {
 		return err
 	}
-	client := getClient(req)
-	resp, err := client.Do(req)
+
+	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return fmt.Errorf("error checking update: %w", err)
 	}
-	if resp.StatusCode != 200 {
+	if resp.StatusCode != http.StatusOK {
 		return fmt.Errorf("unexpected status attempting to download update %d", resp.StatusCode)
 	}
 	resp.Body.Close()
@@ -144,14 +135,14 @@ func DownloadNewRelease(ctx context.Context, updateResp UpdateResponse) error {
 	// Check to see if we already have it downloaded
 	_, err = os.Stat(stageFilename)
 	if err == nil {
-		slog.Debug("update already downloaded")
+		slog.Info("update already downloaded")
 		return nil
 	}
 
 	cleanupOldDownloads()
 
 	req.Method = http.MethodGet
-	resp, err = client.Do(req)
+	resp, err = http.DefaultClient.Do(req)
 	if err != nil {
 		return fmt.Errorf("error checking update: %w", err)
 	}
@@ -231,7 +222,7 @@ func StartBackgroundUpdaterChecker(ctx context.Context, cb func(string) error) {
 				slog.Debug("stopping background update checker")
 				return
 			default:
-				time.Sleep(60 * 60 * time.Second)
+				time.Sleep(UpdateCheckInterval)
 			}
 		}
 	}()

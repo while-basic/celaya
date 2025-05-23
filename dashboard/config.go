@@ -172,8 +172,5 @@ func SaveConfig(config *AgentConfig, path string) error {
 
 // EnsureLogDirectory ensures the log directory exists
 func EnsureLogDirectory(path string) error {
-	if _, err := os.Stat(path); os.IsNotExist(err) {
-		return os.MkdirAll(path, 0755)
-	}
-	return nil
+	return os.MkdirAll(path, 0755)
 }

@@ -6,3 +6,9 @@
 {"timestamp":"2025-05-23T03:23:25.768253-06:00","level":"INFO","message":"Agent Echo responded: Message about find the fastest path to work received and understood. Proceeding with coordination.","agent":"Echo","response":"Message about find the fastest path to work received and understood. Proceeding with coordination."}
 {"timestamp":"2025-05-23T03:23:40.615077-06:00","level":"INFO","message":"Agent Echo performed action: Received command: continue","agent":"Echo","action":"Received command: continue"}
 {"timestamp":"2025-05-23T03:23:42.411028-06:00","level":"INFO","message":"Agent Echo responded: Message about continue received and understood. Proceeding with coordination.","agent":"Echo","response":"Message about continue received and understood. Proceeding with coordination."}
+{"timestamp":"2025-05-23T03:32:11.517361-06:00","level":"INFO","message":"Agent Echo performed action: Received command: hello everyone","agent":"Echo","action":"Received command: hello everyone"}
+{"timestamp":"2025-05-23T03:32:13.402177-06:00","level":"INFO","message":"Agent Echo responded: I've received your command about hello everyone and will relay it to others.","agent":"Echo","response":"I've received your command about hello everyone and will relay it to others."}
+{"agent":"Echo","level":"INFO","message":"Agent is healthy","timestamp":"2025-05-23T03:34:47-06:00"}
+{"agent":"Echo","level":"INFO","message":"Health check failed: simulated connection error to http://localhost:5001","timestamp":"2025-05-23T03:39:43-06:00"}
+{"agent":"Echo","level":"INFO","message":"Action: what's wrong with echo?","timestamp":"2025-05-23T03:39:59-06:00"}
+{"agent":"Echo","level":"INFO","message":"Response: Error: Agent 'Echo' is not currently active. Please check health.","timestamp":"2025-05-23T03:39:59-06:00"}

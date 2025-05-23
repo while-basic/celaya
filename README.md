@@ -1,126 +1,83 @@
-# Celaya Agent Orchestration System
+# Multi-Agent Dashboard
 
-A powerful multi-agent communication system using 13 specialized agents to collaborate on complex tasks. This system supports both fully simulated agents (for demonstration and prototyping) and integration with real Celaya LLM instances.
+The Multi-Agent Dashboard is a terminal-based UI for monitoring and interacting with multiple agents in parallel. It provides a centralized interface for sending commands to agents, viewing their responses, and managing agent interactions.
 
-## Overview
+## Features
 
-This system implements an 13-agent orchestration framework where each agent has a specialized role and personality. The agents communicate through a central orchestrator, allowing for structured turn-taking and private messaging between agents.
+### Core Features
+- **Parallel Agent Monitoring**: View all agent activities in separate terminal panels
+- **Central Command Interface**: Send commands to all agents from a single input
+- **Health Monitoring**: Check agent availability and status
+- **Color-Coded Interface**: Visual indicators for different message types and agent states
+- **JSON Logging**: Detailed logs stored for each agent
 
-## Key Features
+### Advanced Features
+- **Direct Messaging**: Send messages to specific agents using `dm <agent> <message>`
+- **Focus Mode**: Select specific agents to focus on with `focus <agent1> <agent2> ...`
+- **Agent Groups**: Group agents for targeted commands using `group <groupname> <message>`
+- **Command Templates**: Use templates for common tasks with `template <name> [args]`
+- **Command History**: Navigate through previous commands with arrow keys
 
-- **11 Specialized Agents**: Each with unique roles, personalities, and expertise
-- **Flexible Deployment**: Run in simulation mode or with actual LLM API connections
-- **Direct Messaging**: Agents can communicate privately among themselves
-- **Conversation History**: Full logging and persistence of agent interactions
-- **Easy Customization**: Adjust system prompts, conversation topics, and agent behaviors
+## Getting Started
 
-## Agent Roles
+### Prerequisites
+- Go 1.18 or higher
+- Terminal with color support
 
-| Agent    | Role                  | Description                                                |
-|----------|------------------------|------------------------------------------------------------|
-| Echo     | Communicator          | Clarifies and streamlines communication between agents      |
-| Verdict  | Decision Maker        | Analyzes discussions and makes decisive judgments           |
-| Vitals   | Health Monitor        | Monitors system health, balance, and sustainability         |
-| Core     | Foundation Builder    | Establishes fundamental principles and frameworks           |
-| Theory   | Conceptual Thinker    | Explores theoretical implications and abstract concepts     |
-| Sentinel | Guardian              | Ensures security, integrity, and ethical considerations     |
-| Beacon   | Guide                 | Provides strategic guidance and navigation                  |
-| Lens     | Perspective Shifter   | Offers alternative viewpoints and reframings                |
-| Volt     | Energizer             | Brings enthusiasm and motivational energy                   |
-| Clarity  | Simplifier            | Distills complex ideas into clear, accessible concepts      |
-| Arkive   | Historian             | Provides context from past discussions and decisions        |
-| Otto     |
-
-## Demo Options
-
-This repository includes several demonstration options:
-
-1. **Mock Demo**: A basic simulation using predefined responses
-2. **Simulated Demo**: A complete simulation of all 11 agents with realistic interactions
-3. **Direct Message Demo**: Demonstration of private messaging between agents
-4. **Full Demo**: Complete system using actual Celaya LLM instances (requires Celaya binary)
-
-## Running the Demos
-
-The simplest way to explore the system is to use the demo script:
-
-```bash
-# Show available demos
-python demo.py
-
-# Run the simulated demo
-python demo.py --type simulated
-
-# Run with a custom prompt
-python demo.py --type simulated --prompt "Let's discuss the ethical implications of AI-generated art"
-
-# Set maximum conversation turns
-python demo.py --type simulated --max-turns 20
-```
-
-## Setup for Full Implementation
-
-To run the system with actual Celaya instances:
-
-1. Ensure you have the Celaya binary installed and available at `../celaya`
-2. Pull the required models:
-   ```bash
-   ./celaya pull echo
-   ./celaya pull verdict
-   ./celaya pull vitals
-   ./celaya pull core
-   ./celaya pull theory
-   ./celaya pull sentinel
-   ./celaya pull beacon
-   ./celaya pull lens
-   ./celaya pull volt
-   ./celaya pull clarity
-   ./celaya pull arkive
+### Installation
+1. Clone the repository
+2. Navigate to the project directory
+3. Run the dashboard:
    ```
-3. Run the full demo:
-   ```bash
-   python demo.py --type full
+   ./run_dashboard.sh
    ```
 
-## Project Structure
+### Configuration
+The dashboard is configured using a `config.json` file. A default configuration is created on the first run, which you can customize. The configuration defines:
 
+- Agent profiles (name, model, role, URL)
+- Agent groups
+- Command templates
+- Dashboard settings
+
+## Using the Dashboard
+
+### Command Reference
+
+| Command | Description |
+|---------|-------------|
+| `health` | Check the health status of all agents |
+| `focus <agent1> <agent2> ...` | Focus on specific agents (commands only go to focused agents) |
+| `unfocus <agent1> <agent2> ...` | Remove focus from agents |
+| `unfocus all` | Remove focus from all agents |
+| `dm <agent> <message>` | Send a direct message to a specific agent |
+| `group <groupname> <message>` | Send a message to a predefined group of agents |
+| `groups` | List available agent groups |
+| `template <name> [args]` | Use a command template |
+| `templates` | List available templates |
+| `help` | Show available commands |
+| `quit` or `exit` | Exit the application |
+
+Any other input is treated as a command to be sent to all agents (or focused agents if focus is active).
+
+### Simulation Mode
+
+The dashboard supports a simulation mode for testing without actual agent servers. In this mode, the dashboard generates realistic responses based on agent roles and command content.
+
+To run in simulation mode:
 ```
-celaya-agents/
-├── agent_config.json       # Configuration for all agents
-├── demo.py                 # Demo runner script
-├── direct_message_example.py  # Example of direct messaging
-├── example.py              # Basic example implementation
-├── orchestrator.py         # Main orchestration system
-├── README.md               # This file
-├── requirements.txt        # Python dependencies
-├── run_simulated.py        # Simulated agent system
-└── setup_agents.py         # Utility to set up Celaya instances
+DASHBOARD_SIM_MODE=true ./agent_dashboard
 ```
 
-## Examining Conversations
-
-After running a demo, you can examine the conversation logs:
-
-- `conversation_log.json`: Generated by basic example
-- `simulated_conversation_log.json`: Generated by simulated demo
-- `direct_message_conversation.json`: Generated by direct message demo
-
-## Customizing Agents
-
-The agent personalities and system prompts can be customized in the `agent_config.json` file. Each agent has the following configurable attributes:
-
-- `name`: The agent's identifier
-- `url`: API endpoint (for full implementation)
-- `model`: LLM model to use
-- `system_prompt`: System prompt that shapes the agent's behavior
-- `role`: The agent's specialized role
-
-## Requirements
-
-- Python 3.8+
-- See `requirements.txt` for Python dependencies
-- Celaya binary (optional, for full implementation)
+Or use the provided script:
+```
+./run_dashboard.sh
+```
 
 ## License
 
-BSL (SPDX id BUSL)
+This project is licensed under the Business Source License (BSL) - see the LICENSE file for details.
+
+## Contact
+
+Christopher Celaya - [chris@celayasolutions.com](mailto:chris@celayasolutions.com)

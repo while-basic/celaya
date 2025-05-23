@@ -3,7 +3,7 @@
 //  Project:     Celaya Solutions (Agent Dashboard)
 //  Created by:  Celaya Solutions, 2025
 //  Author:      Christopher Celaya <chris@celayasolutions.com>
-//  Description: Orchestrates agent activity for parallel processing
+//  Description: Orchestrator for coordinating agent activities
 //  Version:     1.0.0
 //  License:     BSL (SPDX id BUSL)
 //  Last Update: (May 2025)
@@ -17,186 +17,280 @@ import (
 	"sync"
 	"time"
 
+	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
 )
 
-// Orchestrator coordinates the activities of multiple agents
+// Orchestrator coordinates activities among multiple agents
 type Orchestrator struct {
-	agents       []Agent
-	apiClient    *APIClient
-	logger       *Logger
-	agentPanels  map[string]*tview.TextView
-	app          *tview.Application
-	outputView   *tview.TextView
-	outputWriter *Writer
+	Agents       []Agent
+	API          *APIClient
+	Logger       *Logger
+	AgentPanels  map[string]*tview.TextView
+	App          *tview.Application
+	OutputView   *tview.TextView
+	ActiveAgents map[string]bool
+	mu           sync.Mutex
 }
 
-// NewOrchestrator creates a new orchestrator
+// NewOrchestrator creates a new orchestrator instance
 func NewOrchestrator(
 	agents []Agent,
-	apiClient *APIClient,
+	api *APIClient,
 	logger *Logger,
-	agentPanels map[string]*tview.TextView,
+	panels map[string]*tview.TextView,
 	app *tview.Application,
-	outputView *tview.TextView,
+	output *tview.TextView,
 ) *Orchestrator {
 	return &Orchestrator{
-		agents:       agents,
-		apiClient:    apiClient,
-		logger:       logger,
-		agentPanels:  agentPanels,
-		app:          app,
-		outputView:   outputView,
-		outputWriter: &Writer{TextView: outputView},
+		Agents:       agents,
+		API:          api,
+		Logger:       logger,
+		AgentPanels:  panels,
+		App:          app,
+		OutputView:   output,
+		ActiveAgents: make(map[string]bool),
 	}
 }
 
-// ProcessCommand processes a command in parallel across all agents
+// ProcessCommand sends a command to all agents
 func (o *Orchestrator) ProcessCommand(ctx context.Context, command string) {
-	// Log the command reception
-	fmt.Fprintf(o.outputWriter, "[cyan]Processing command: %s[white]\n", command)
-
-	// Create a wait group to wait for all agents to complete
 	var wg sync.WaitGroup
 
-	// Launch goroutines for each agent to process in parallel
-	for _, agent := range o.agents {
+	// Process the command for each agent
+	for _, agent := range o.Agents {
 		wg.Add(1)
-
-		go func(agent Agent) {
+		go func(a Agent) {
 			defer wg.Done()
-
-			// Propagate cancellation from the parent context
-			agentCtx, cancel := context.WithTimeout(ctx, 30*time.Second)
-			defer cancel()
-
-			// Attempt to process the command with this agent
-			o.processAgentCommand(agentCtx, agent, command)
+			o.sendCommandToAgent(ctx, command, a)
 		}(agent)
 	}
 
-	// Wait for all agents to complete
-	wg.Wait()
-
-	// Log completion
-	fmt.Fprintf(o.outputWriter, "[green]All agents have processed the command[white]\n")
+	// Wait for all agents to process the command
+	go func() {
+		wg.Wait()
+		o.logToOutput("[cyan]All agents have processed the command.[white]\n")
+	}()
 }
 
-// processAgentCommand processes a command with a specific agent
-func (o *Orchestrator) processAgentCommand(ctx context.Context, agent Agent, command string) {
-	panel := o.agentPanels[agent.Name]
-	if panel == nil {
+// ProcessCommandForAgents sends a command to a specific set of agents
+func (o *Orchestrator) ProcessCommandForAgents(ctx context.Context, command string, agents []Agent) {
+	if len(agents) == 0 {
+		o.logToOutput("[yellow]No agents specified for command.[white]\n")
 		return
 	}
 
-	// Create a writer for the panel
-	panelWriter := &Writer{TextView: panel}
+	var wg sync.WaitGroup
 
-	// Update the panel with the received command
-	o.app.QueueUpdateDraw(func() {
-		fmt.Fprintf(panelWriter, "[blue]%s [RECEIVED][white] Command: %s\n",
-			time.Now().Format("15:04:05"), command)
-		panel.ScrollToEnd()
-	})
+	// Process the command for each specified agent
+	for _, agent := range agents {
+		wg.Add(1)
+		go func(a Agent) {
+			defer wg.Done()
+			o.sendCommandToAgent(ctx, command, a)
+		}(agent)
+	}
 
+	// Wait for all agents to process the command
+	go func() {
+		wg.Wait()
+		o.logToOutput(fmt.Sprintf("[cyan]Command processed by %d agents.[white]\n", len(agents)))
+	}()
+}
+
+// ProcessDirectMessage sends a direct message to a specific agent
+func (o *Orchestrator) ProcessDirectMessage(ctx context.Context, message string, agent Agent) {
+	// Log the direct message in the agent's panel
+	panel := o.AgentPanels[agent.Name]
+	if panel != nil {
+		o.App.QueueUpdateDraw(func() {
+			fmt.Fprintf(panel, "[magenta]%s [DIRECT MESSAGE][white] %s\n",
+				time.Now().Format("15:04:05"), message)
+			panel.ScrollToEnd()
+		})
+	}
+
+	// Send the command to the agent
+	o.sendCommandToAgent(ctx, message, agent)
+}
+
+// sendCommandToAgent sends a command to a specific agent
+func (o *Orchestrator) sendCommandToAgent(ctx context.Context, command string, agent Agent) {
 	// Log the action
-	if err := o.logger.LogAgentAction(agent.Name, fmt.Sprintf("Received command: %s", command)); err != nil {
-		o.app.QueueUpdateDraw(func() {
-			fmt.Fprintf(panelWriter, "[red]%s [ERROR][white] Failed to log action: %v\n",
-				time.Now().Format("15:04:05"), err)
+	o.logAgentAction(agent.Name, command)
+
+	// Update the agent panel with the command
+	panel := o.AgentPanels[agent.Name]
+	if panel != nil {
+		o.App.QueueUpdateDraw(func() {
+			fmt.Fprintf(panel, "[yellow]%s [COMMAND][white] %s\n",
+				time.Now().Format("15:04:05"), command)
 			panel.ScrollToEnd()
 		})
 	}
 
-	// Create the generate request
-	req := &GenerateRequest{
-		Model:  agent.Model,
-		Prompt: fmt.Sprintf("Command from user: %s\n\nRespond as %s (%s).", command, agent.Name, agent.Role),
-		System: agent.SystemPrompt,
-		Stream: false,
-	}
+	// If the agent is not active, show a message and return
+	if !o.isAgentActive(agent.Name) {
+		response := fmt.Sprintf("Error: Agent '%s' is not currently active. Please check health.", agent.Name)
+		o.logAgentResponse(agent.Name, response)
 
-	// Call the agent API
-	res, err := o.apiClient.Generate(ctx, agent.URL, req)
-	if err != nil {
-		// Handle error
-		o.app.QueueUpdateDraw(func() {
-			fmt.Fprintf(panelWriter, "[red]%s [ERROR][white] Failed to generate response: %v\n",
-				time.Now().Format("15:04:05"), err)
-			panel.ScrollToEnd()
-		})
-
-		// Log the error
-		if logErr := o.logger.LogAgentError(agent.Name, fmt.Sprintf("API error: %v", err)); logErr != nil {
-			fmt.Printf("Failed to log error: %v\n", logErr)
+		if panel != nil {
+			o.App.QueueUpdateDraw(func() {
+				fmt.Fprintf(panel, "[red]%s [ERROR][white] %s\n",
+					time.Now().Format("15:04:05"), response)
+				panel.ScrollToEnd()
+			})
 		}
 		return
 	}
 
-	// Update the panel with the response
-	o.app.QueueUpdateDraw(func() {
-		fmt.Fprintf(panelWriter, "[green]%s [RESPONSE][white] %s\n",
-			time.Now().Format("15:04:05"), res.Response)
-		panel.ScrollToEnd()
-	})
+	// Send the command to the agent via API
+	response, err := o.sendAgentCommand(ctx, agent, command)
+	if err != nil {
+		errMsg := fmt.Sprintf("Error: %v", err)
+		o.logAgentResponse(agent.Name, errMsg)
+
+		if panel != nil {
+			o.App.QueueUpdateDraw(func() {
+				fmt.Fprintf(panel, "[red]%s [ERROR][white] %s\n",
+					time.Now().Format("15:04:05"), errMsg)
+				panel.ScrollToEnd()
+			})
+		}
+		return
+	}
 
 	// Log the response
-	if err := o.logger.LogAgentResponse(agent.Name, res.Response); err != nil {
-		o.app.QueueUpdateDraw(func() {
-			fmt.Fprintf(panelWriter, "[red]%s [ERROR][white] Failed to log response: %v\n",
-				time.Now().Format("15:04:05"), err)
+	o.logAgentResponse(agent.Name, response)
+
+	// Update the agent panel with the response
+	if panel != nil {
+		o.App.QueueUpdateDraw(func() {
+			fmt.Fprintf(panel, "[green]%s [RESPONSE][white] %s\n",
+				time.Now().Format("15:04:05"), response)
 			panel.ScrollToEnd()
 		})
 	}
 }
 
+// sendAgentCommand sends a command to an agent via the API
+func (o *Orchestrator) sendAgentCommand(ctx context.Context, agent Agent, command string) (string, error) {
+	// Log the command
+	o.Logger.LogInfo(agent.Name, fmt.Sprintf("Sending command: %s", command))
+
+	// Send the command to the agent via API
+	return o.API.SendCommand(ctx, agent, command)
+}
+
+// logAgentAction logs an agent action
+func (o *Orchestrator) logAgentAction(agentName, action string) {
+	o.Logger.LogInfo(agentName, fmt.Sprintf("Action: %s", action))
+}
+
+// logAgentResponse logs an agent response
+func (o *Orchestrator) logAgentResponse(agentName, response string) {
+	o.Logger.LogInfo(agentName, fmt.Sprintf("Response: %s", response))
+}
+
 // CheckAgentHealth checks the health of all agents
-func (o *Orchestrator) CheckAgentHealth(ctx context.Context) map[string]bool {
-	// Create a map to store health status
-	healthStatus := make(map[string]bool, len(o.agents))
-
-	// Create a wait group to wait for all health checks
+func (o *Orchestrator) CheckAgentHealth(ctx context.Context) {
 	var wg sync.WaitGroup
-	var mu sync.Mutex
 
-	// Check each agent in parallel
-	for _, agent := range o.agents {
+	// Check the health of each agent
+	for _, agent := range o.Agents {
 		wg.Add(1)
-
-		go func(agent Agent) {
+		go func(a Agent) {
 			defer wg.Done()
 
-			// Check health with timeout
-			agentCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
-			defer cancel()
+			panel := o.AgentPanels[a.Name]
+			if panel == nil {
+				return
+			}
 
-			healthy, _ := o.apiClient.Health(agentCtx, agent.URL)
+			// Update the panel with the health check
+			o.App.QueueUpdateDraw(func() {
+				fmt.Fprintf(panel, "[yellow]%s [HEALTH CHECK][white] Checking agent health...\n",
+					time.Now().Format("15:04:05"))
+				panel.ScrollToEnd()
+			})
 
-			// Store result
-			mu.Lock()
-			healthStatus[agent.Name] = healthy
-			mu.Unlock()
+			// Check the agent's health via API
+			healthy, err := o.API.CheckHealth(ctx, a)
 
-			// Update panel
-			panel := o.agentPanels[agent.Name]
-			if panel != nil {
-				panelWriter := &Writer{TextView: panel}
-				o.app.QueueUpdateDraw(func() {
-					if healthy {
-						fmt.Fprintf(panelWriter, "[green]%s [HEALTH][white] Agent is healthy\n",
-							time.Now().Format("15:04:05"))
-					} else {
-						fmt.Fprintf(panelWriter, "[red]%s [HEALTH][white] Agent is not responding\n",
-							time.Now().Format("15:04:05"))
-					}
+			if err != nil || !healthy {
+				errorMsg := "Agent is not responding"
+				if err != nil {
+					errorMsg = fmt.Sprintf("Health check failed: %v", err)
+				}
+
+				o.setAgentActive(a.Name, false)
+
+				// Log the health check error
+				o.Logger.LogInfo(a.Name, errorMsg)
+
+				// Update the panel with the health check error
+				o.App.QueueUpdateDraw(func() {
+					fmt.Fprintf(panel, "[red]%s [HEALTH ERROR][white] %s\n",
+						time.Now().Format("15:04:05"), errorMsg)
+					panel.SetBorderColor(tcell.ColorRed)
 					panel.ScrollToEnd()
 				})
+
+				// Log to main output
+				o.logToOutput(fmt.Sprintf("[red]%s is not healthy: %s[white]\n", a.Name, errorMsg))
+			} else {
+				o.setAgentActive(a.Name, true)
+
+				// Log the health check success
+				o.Logger.LogInfo(a.Name, "Agent is healthy")
+
+				// Update the panel with the health check success
+				o.App.QueueUpdateDraw(func() {
+					fmt.Fprintf(panel, "[green]%s [HEALTH OK][white] Agent is healthy\n",
+						time.Now().Format("15:04:05"))
+					panel.SetBorderColor(tcell.ColorBlue)
+					panel.ScrollToEnd()
+				})
+
+				// Log to main output
+				o.logToOutput(fmt.Sprintf("[green]%s is healthy[white]\n", a.Name))
 			}
 		}(agent)
 	}
 
-	// Wait for all health checks
-	wg.Wait()
+	// Wait for all health checks to complete
+	go func() {
+		wg.Wait()
+		o.logToOutput("[cyan]Health check completed for all agents.[white]\n")
+	}()
+}
 
-	return healthStatus
+// isAgentActive checks if an agent is active
+func (o *Orchestrator) isAgentActive(agentName string) bool {
+	o.mu.Lock()
+	defer o.mu.Unlock()
+
+	// If the agent doesn't exist in the map, assume it's active
+	// This is to allow commands before a health check has been run
+	if _, exists := o.ActiveAgents[agentName]; !exists {
+		return true
+	}
+
+	return o.ActiveAgents[agentName]
+}
+
+// setAgentActive sets an agent's active status
+func (o *Orchestrator) setAgentActive(agentName string, active bool) {
+	o.mu.Lock()
+	defer o.mu.Unlock()
+
+	o.ActiveAgents[agentName] = active
+}
+
+// logToOutput logs a message to the main output view
+func (o *Orchestrator) logToOutput(message string) {
+	o.App.QueueUpdateDraw(func() {
+		fmt.Fprint(o.OutputView, message)
+		o.OutputView.ScrollToEnd()
+	})
 }

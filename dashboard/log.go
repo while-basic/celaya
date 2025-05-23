@@ -20,173 +20,165 @@ import (
 	"time"
 )
 
-// Logger handles logging of agent activity
+// LogLevel represents a log level
+type LogLevel string
+
+const (
+	INFO  LogLevel = "INFO"
+	ERROR LogLevel = "ERROR"
+	DEBUG LogLevel = "DEBUG"
+	WARN  LogLevel = "WARN"
+)
+
+// Logger provides logging functionality
 type Logger struct {
-	logDir     string
-	logFiles   map[string]*os.File
-	mutex      sync.Mutex
-	formatJSON bool
+	baseDir  string
+	jsonLogs bool
+	files    map[string]*os.File
+	mu       sync.Mutex
 }
 
-// NewLogger creates a new logger instance
-func NewLogger(logDir string, formatJSON bool) (*Logger, error) {
-	// Ensure log directory exists
-	if err := os.MkdirAll(logDir, 0755); err != nil {
-		return nil, fmt.Errorf("failed to create log directory: %w", err)
+// NewLogger creates a new logger
+func NewLogger(baseDir string, jsonLogs bool) (*Logger, error) {
+	// Create logger
+	logger := &Logger{
+		baseDir:  baseDir,
+		jsonLogs: jsonLogs,
+		files:    make(map[string]*os.File),
 	}
 
-	return &Logger{
-		logDir:     logDir,
-		logFiles:   make(map[string]*os.File),
-		formatJSON: formatJSON,
-	}, nil
+	return logger, nil
 }
 
-// LogAgentAction logs an agent action
-func (l *Logger) LogAgentAction(agentName, action string) error {
-	l.mutex.Lock()
-	defer l.mutex.Unlock()
-
-	// Get log file for agent
-	logFile, err := l.getLogFile(agentName)
-	if err != nil {
-		return err
-	}
-
-	// Create log entry
-	timestamp := time.Now()
-	entry := LogEntry{
-		Timestamp: timestamp,
-		Level:     "INFO",
-		Message:   fmt.Sprintf("Agent %s performed action: %s", agentName, action),
-		Agent:     agentName,
-		Action:    action,
-	}
-
-	// Write log entry
-	return l.writeLogEntry(logFile, entry)
-}
-
-// LogAgentResponse logs an agent response
-func (l *Logger) LogAgentResponse(agentName, response string) error {
-	l.mutex.Lock()
-	defer l.mutex.Unlock()
-
-	// Get log file for agent
-	logFile, err := l.getLogFile(agentName)
-	if err != nil {
-		return err
-	}
-
-	// Create log entry
-	timestamp := time.Now()
-	entry := LogEntry{
-		Timestamp: timestamp,
-		Level:     "INFO",
-		Message:   fmt.Sprintf("Agent %s responded: %s", agentName, response),
-		Agent:     agentName,
-		Response:  response,
-	}
-
-	// Write log entry
-	return l.writeLogEntry(logFile, entry)
-}
-
-// LogAgentError logs an agent error
-func (l *Logger) LogAgentError(agentName, errMsg string) error {
-	l.mutex.Lock()
-	defer l.mutex.Unlock()
-
-	// Get log file for agent
-	logFile, err := l.getLogFile(agentName)
-	if err != nil {
-		return err
-	}
-
-	// Create log entry
-	timestamp := time.Now()
-	entry := LogEntry{
-		Timestamp: timestamp,
-		Level:     "ERROR",
-		Message:   fmt.Sprintf("Agent %s error: %s", agentName, errMsg),
-		Agent:     agentName,
-	}
-
-	// Write log entry
-	return l.writeLogEntry(logFile, entry)
-}
-
-// getLogFile gets (or creates) a log file for the specified agent
-func (l *Logger) getLogFile(agentName string) (*os.File, error) {
-	// Check if log file already open
-	if file, ok := l.logFiles[agentName]; ok {
-		return file, nil
-	}
-
-	// Create log file
-	logPath := filepath.Join(l.logDir, fmt.Sprintf("agent_%s.log", agentName))
-	file, err := os.OpenFile(logPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
-	if err != nil {
-		return nil, fmt.Errorf("failed to open log file: %w", err)
-	}
-
-	// Store log file
-	l.logFiles[agentName] = file
-
-	return file, nil
-}
-
-// writeLogEntry writes a log entry to the specified file
-func (l *Logger) writeLogEntry(file *os.File, entry LogEntry) error {
-	var logLine string
-	var err error
-
-	if l.formatJSON {
-		// Format as JSON
-		data, err := json.Marshal(entry)
-		if err != nil {
-			return fmt.Errorf("failed to marshal log entry: %w", err)
-		}
-		logLine = string(data) + "\n"
-	} else {
-		// Format as plain text
-		if entry.Action != "" {
-			logLine = fmt.Sprintf("[%s] [%s] [%s] ACTION: %s\n",
-				entry.Timestamp.Format(time.RFC3339),
-				entry.Level,
-				entry.Agent,
-				entry.Action)
-		} else if entry.Response != "" {
-			logLine = fmt.Sprintf("[%s] [%s] [%s] RESPONSE: %s\n",
-				entry.Timestamp.Format(time.RFC3339),
-				entry.Level,
-				entry.Agent,
-				entry.Response)
-		} else {
-			logLine = fmt.Sprintf("[%s] [%s] [%s] %s\n",
-				entry.Timestamp.Format(time.RFC3339),
-				entry.Level,
-				entry.Agent,
-				entry.Message)
-		}
-	}
-
-	// Write log line
-	_, err = file.WriteString(logLine)
-	return err
-}
-
-// Close closes all open log files
+// Close closes all log files
 func (l *Logger) Close() error {
-	l.mutex.Lock()
-	defer l.mutex.Unlock()
+	l.mu.Lock()
+	defer l.mu.Unlock()
 
 	var lastErr error
-	for _, file := range l.logFiles {
+	for _, file := range l.files {
 		if err := file.Close(); err != nil {
 			lastErr = err
 		}
 	}
 
 	return lastErr
+}
+
+// getLogFile gets or creates a log file for an agent
+func (l *Logger) getLogFile(agentName string) (*os.File, error) {
+	l.mu.Lock()
+	defer l.mu.Unlock()
+
+	// Check if file exists
+	if file, ok := l.files[agentName]; ok {
+		return file, nil
+	}
+
+	// Create log file
+	fileName := fmt.Sprintf("agent_%s.log", agentName)
+	filePath := filepath.Join(l.baseDir, fileName)
+
+	file, err := os.OpenFile(filePath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		return nil, err
+	}
+
+	// Store file
+	l.files[agentName] = file
+
+	return file, nil
+}
+
+// LogInfo logs an info message for an agent
+func (l *Logger) LogInfo(agentName, message string) error {
+	return l.log(agentName, INFO, message, "", "")
+}
+
+// LogError logs an error message for an agent
+func (l *Logger) LogError(agentName, message string) error {
+	return l.log(agentName, ERROR, message, "", "")
+}
+
+// LogDebug logs a debug message for an agent
+func (l *Logger) LogDebug(agentName, message string) error {
+	return l.log(agentName, DEBUG, message, "", "")
+}
+
+// LogWarn logs a warning message for an agent
+func (l *Logger) LogWarn(agentName, message string) error {
+	return l.log(agentName, WARN, message, "", "")
+}
+
+// LogAction logs an action performed by an agent
+func (l *Logger) LogAction(agentName, action string) error {
+	return l.log(agentName, INFO, "", action, "")
+}
+
+// LogResponse logs a response from an agent
+func (l *Logger) LogResponse(agentName, response string) error {
+	return l.log(agentName, INFO, "", "", response)
+}
+
+// log logs a message to an agent's log file
+func (l *Logger) log(agentName string, level LogLevel, message, action, response string) error {
+	// Get log file
+	file, err := l.getLogFile(agentName)
+	if err != nil {
+		return err
+	}
+
+	// Create log entry
+	now := time.Now()
+
+	if l.jsonLogs {
+		// Create log entry as JSON
+		entry := map[string]interface{}{
+			"timestamp": now.Format(time.RFC3339),
+			"level":     level,
+			"agent":     agentName,
+		}
+
+		// Add message, action, or response
+		if message != "" {
+			entry["message"] = message
+		}
+		if action != "" {
+			entry["action"] = action
+		}
+		if response != "" {
+			entry["response"] = response
+		}
+
+		// Marshal to JSON
+		data, err := json.Marshal(entry)
+		if err != nil {
+			return err
+		}
+
+		// Write to file
+		if _, err := file.Write(data); err != nil {
+			return err
+		}
+		if _, err := file.Write([]byte("\n")); err != nil {
+			return err
+		}
+	} else {
+		// Create log entry as plain text
+		var logMessage string
+		if message != "" {
+			logMessage = fmt.Sprintf("[%s] [%s] %s: %s\n", now.Format(time.RFC3339), level, agentName, message)
+		} else if action != "" {
+			logMessage = fmt.Sprintf("[%s] [%s] %s: ACTION: %s\n", now.Format(time.RFC3339), level, agentName, action)
+		} else if response != "" {
+			logMessage = fmt.Sprintf("[%s] [%s] %s: RESPONSE: %s\n", now.Format(time.RFC3339), level, agentName, response)
+		}
+
+		// Write to file
+		if _, err := file.WriteString(logMessage); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }

@@ -1,0 +1,8 @@
+{"timestamp":"2025-05-23T03:20:32.212803-06:00","level":"INFO","message":"Agent Lens performed action: Received command: hello everyone","agent":"Lens","action":"Received command: hello everyone"}
+{"timestamp":"2025-05-23T03:20:32.275036-06:00","level":"ERROR","message":"Agent Lens error: API error: error sending request: Post \"http://localhost:5008/api/generate\": dial tcp [::1]:5008: connect: connection refused","agent":"Lens"}
+{"timestamp":"2025-05-23T03:22:46.460389-06:00","level":"INFO","message":"Agent Lens performed action: Received command: hello all","agent":"Lens","action":"Received command: hello all"}
+{"timestamp":"2025-05-23T03:22:47.991612-06:00","level":"INFO","message":"Agent Lens responded: Reframing hello all helps us see better solutions.","agent":"Lens","response":"Reframing hello all helps us see better solutions."}
+{"timestamp":"2025-05-23T03:23:25.157644-06:00","level":"INFO","message":"Agent Lens performed action: Received command: find the fastest path to work","agent":"Lens","action":"Received command: find the fastest path to work"}
+{"timestamp":"2025-05-23T03:23:26.510973-06:00","level":"INFO","message":"Agent Lens responded: Have we considered alternative approaches to find the fastest path to work?","agent":"Lens","response":"Have we considered alternative approaches to find the fastest path to work?"}
+{"timestamp":"2025-05-23T03:23:40.693716-06:00","level":"INFO","message":"Agent Lens performed action: Received command: continue","agent":"Lens","action":"Received command: continue"}
+{"timestamp":"2025-05-23T03:23:42.321185-06:00","level":"INFO","message":"Agent Lens responded: Reframing continue helps us see better solutions.","agent":"Lens","response":"Reframing continue helps us see better solutions."}

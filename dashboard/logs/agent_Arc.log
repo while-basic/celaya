@@ -1,0 +1,8 @@
+{"timestamp":"2025-05-23T03:20:32.248725-06:00","level":"INFO","message":"Agent Arc performed action: Received command: hello everyone","agent":"Arc","action":"Received command: hello everyone"}
+{"timestamp":"2025-05-23T03:20:32.318753-06:00","level":"ERROR","message":"Agent Arc error: API error: error sending request: Post \"http://localhost:5012/api/generate\": dial tcp [::1]:5012: connect: connection refused","agent":"Arc"}
+{"timestamp":"2025-05-23T03:22:46.478126-06:00","level":"INFO","message":"Agent Arc performed action: Received command: hello all","agent":"Arc","action":"Received command: hello all"}
+{"timestamp":"2025-05-23T03:22:47.661952-06:00","level":"INFO","message":"Agent Arc responded: Let me weave hello all into our ongoing narrative.","agent":"Arc","response":"Let me weave hello all into our ongoing narrative."}
+{"timestamp":"2025-05-23T03:23:25.268165-06:00","level":"INFO","message":"Agent Arc performed action: Received command: find the fastest path to work","agent":"Arc","action":"Received command: find the fastest path to work"}
+{"timestamp":"2025-05-23T03:23:26.574965-06:00","level":"INFO","message":"Agent Arc responded: Let me weave find the fastest path to work into our ongoing narrative.","agent":"Arc","response":"Let me weave find the fastest path to work into our ongoing narrative."}
+{"timestamp":"2025-05-23T03:23:40.667673-06:00","level":"INFO","message":"Agent Arc performed action: Received command: continue","agent":"Arc","action":"Received command: continue"}
+{"timestamp":"2025-05-23T03:23:41.454736-06:00","level":"INFO","message":"Agent Arc responded: Let me weave continue into our ongoing narrative.","agent":"Arc","response":"Let me weave continue into our ongoing narrative."}

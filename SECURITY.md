@@ -1,6 +1,6 @@
 # Security
 
-The Ollama maintainer team takes security seriously and will actively work to resolve security issues.
+The Celaya maintainer team takes security seriously and will actively work to resolve security issues.
 
 ## Reporting a vulnerability
 
@@ -22,4 +22,4 @@ While the maintainer team does their best to secure Ollama, users are encouraged
 
 ## Contact
 
-For any other questions or concerns related to security, please contact us at hello@celaya.com
+For any other questions or concerns related to security, please contact us at chris@chriscelaya.com

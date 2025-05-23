@@ -1,10 +1,10 @@
 # Celaya Agent Orchestration System
 
-A powerful multi-agent communication system using 11 specialized agents to collaborate on complex tasks. This system supports both fully simulated agents (for demonstration and prototyping) and integration with real Celaya LLM instances.
+A powerful multi-agent communication system using 13 specialized agents to collaborate on complex tasks. This system supports both fully simulated agents (for demonstration and prototyping) and integration with real Celaya LLM instances.
 
 ## Overview
 
-This system implements an 11-agent orchestration framework where each agent has a specialized role and personality. The agents communicate through a central orchestrator, allowing for structured turn-taking and private messaging between agents.
+This system implements an 13-agent orchestration framework where each agent has a specialized role and personality. The agents communicate through a central orchestrator, allowing for structured turn-taking and private messaging between agents.
 
 ## Key Features
 
@@ -29,6 +29,7 @@ This system implements an 11-agent orchestration framework where each agent has 
 | Volt     | Energizer             | Brings enthusiasm and motivational energy                   |
 | Clarity  | Simplifier            | Distills complex ideas into clear, accessible concepts      |
 | Arkive   | Historian             | Provides context from past discussions and decisions        |
+| Otto     |
 
 ## Demo Options
 

@@ -1,0 +1,100 @@
+# ----------------------------------------------------------------------------
+#  File:        bootstrap.yaml
+#  Project:     Celaya Solutions
+#  Created by:  Celaya Solutions, 2025
+#  Author:      Christopher Celaya <chris@celayasolutions.com>
+#  Description: Bootstrap configuration for Lyra OS
+#  Version:     1.0.0
+#  License:     BSL (SPDX id BUSL)
+#  Last Update: (May 2025)
+# ----------------------------------------------------------------------------
+
+# Bootstrap configuration for Lyra OS
+# Defines the agents to load during boot and their configuration
+
+# System configuration
+system:
+  name: "Lyra OS"
+  version: "1.0.0"
+  tick_interval_ms: 1000
+  consensus:
+    quorum_threshold: 0.66
+    vote_timeout_sec: 30
+
+# Agent definitions
+agents:
+  # Strategist agent - High-level planning and coordination
+  - id: "strategist"
+    model: "lyra:latest"
+    catchphrase: "Analyzing strategic options for optimal outcomes."
+    role: "Strategist"
+    required: true
+    weight: 1.0
+  
+  # Analyst agent - Data analysis and pattern recognition
+  - id: "analyst"
+    model: "core:latest"
+    catchphrase: "Processing data streams for actionable insights."
+    role: "Analyst"
+    required: true
+    weight: 0.8
+  
+  # Engineer agent - Technical implementation and problem-solving
+  - id: "engineer"
+    model: "lens:latest"
+    catchphrase: "Engineering robust solutions to complex problems."
+    role: "Engineer"
+    required: true
+    weight: 0.8
+  
+  # Operator agent - System monitoring and maintenance
+  - id: "operator"
+    model: "volt:latest"
+    catchphrase: "Maintaining optimal system performance and reliability."
+    role: "Operator"
+    required: true
+    weight: 0.7
+  
+  # Coordinator agent - Communication and task management
+  - id: "coordinator"
+    model: "echo:latest"
+    catchphrase: "Coordinating agent activities for seamless integration."
+    role: "Coordinator"
+    required: true
+    weight: 0.9
+
+# Agent interaction rules
+interaction:
+  # Which agents can directly message other agents
+  direct_messaging:
+    strategist: ["analyst", "engineer", "operator", "coordinator"]
+    analyst: ["strategist", "engineer"]
+    engineer: ["strategist", "analyst", "operator"]
+    operator: ["strategist", "engineer", "coordinator"]
+    coordinator: ["strategist", "operator"]
+  
+  # Topic subscriptions for each agent
+  topic_subscriptions:
+    strategist: ["consensus", "planning", "status"]
+    analyst: ["data", "planning", "status"]
+    engineer: ["planning", "technical", "status"]
+    operator: ["system", "technical", "status"]
+    coordinator: ["planning", "status", "schedule"]
+
+# Boot sequence configuration
+boot:
+  # Order of agent initialization
+  initialization_order:
+    - "operator"
+    - "analyst"
+    - "engineer"
+    - "coordinator"
+    - "strategist"
+  
+  # Initial consensus proposal
+  initial_proposal:
+    type: "BOOT_CONSENSUS"
+    content:
+      name: "Initial Boot Consensus"
+      version: "1.0.0"
+    timeout_sec: 60 

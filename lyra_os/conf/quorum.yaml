@@ -1,0 +1,139 @@
+# ----------------------------------------------------------------------------
+#  File:        quorum.yaml
+#  Project:     Celaya Solutions
+#  Created by:  Celaya Solutions, 2025
+#  Author:      Christopher Celaya <chris@celayasolutions.com>
+#  Description: Quorum configuration for Lyra OS consensus
+#  Version:     1.0.0
+#  License:     BSL (SPDX id BUSL)
+#  Last Update: (May 2025)
+# ----------------------------------------------------------------------------
+
+# Quorum configuration for Lyra OS
+# Defines the k-of-n rules and veto power map for consensus decisions
+
+# Global quorum settings
+global:
+  # Default quorum threshold (0.0-1.0)
+  default_threshold: 0.66
+  
+  # Minimum number of agents that must participate
+  minimum_participants: 3
+  
+  # Maximum time to wait for votes (in seconds)
+  vote_timeout_sec: 30
+  
+  # Whether to use weighted voting (weighted by agent trust)
+  use_weighted_voting: true
+
+# K-of-N rules for different proposal types
+# Format: k agents out of n must approve for consensus
+k_of_n_rules:
+  # Critical system operations
+  SYSTEM_CRITICAL:
+    k: 5  # All agents
+    n: 5
+    threshold: 0.9
+    minimum_participants: 5
+  
+  # Boot consensus
+  BOOT_CONSENSUS:
+    k: 3
+    n: 5
+    threshold: 0.66
+    minimum_participants: 3
+  
+  # Agent coordination
+  AGENT_COORDINATION:
+    k: 3
+    n: 5
+    threshold: 0.6
+    minimum_participants: 3
+  
+  # Data processing
+  DATA_PROCESSING:
+    k: 2
+    n: 5
+    threshold: 0.5
+    minimum_participants: 2
+  
+  # External communication
+  EXTERNAL_COMMUNICATION:
+    k: 4
+    n: 5
+    threshold: 0.8
+    minimum_participants: 4
+
+# Veto power map
+# Defines which agents have veto power for which proposal types
+veto_powers:
+  # Strategist can veto coordination and external communication
+  strategist:
+    - AGENT_COORDINATION
+    - EXTERNAL_COMMUNICATION
+    - BOOT_CONSENSUS
+  
+  # Analyst can veto data processing
+  analyst:
+    - DATA_PROCESSING
+  
+  # Engineer can veto system critical operations
+  engineer:
+    - SYSTEM_CRITICAL
+  
+  # Operator can veto system critical operations
+  operator:
+    - SYSTEM_CRITICAL
+  
+  # Coordinator can veto agent coordination
+  coordinator:
+    - AGENT_COORDINATION
+
+# Override rules for specific proposal types
+proposal_type_overrides:
+  # System shutdown requires unanimous consent
+  SYSTEM_SHUTDOWN:
+    threshold: 1.0
+    minimum_participants: 5
+    use_weighted_voting: false  # Raw count, not weighted
+  
+  # Emergency response can proceed with fewer agents
+  EMERGENCY_RESPONSE:
+    threshold: 0.51
+    minimum_participants: 2
+    vote_timeout_sec: 10  # Faster response time
+  
+  # External API access needs higher security
+  EXTERNAL_API_ACCESS:
+    threshold: 0.8
+    minimum_participants: 4
+
+# Trust weight modification rules
+trust_weight_rules:
+  # Minimum trust weight allowed
+  minimum_weight: 0.1
+  
+  # Maximum trust weight allowed
+  maximum_weight: 1.0
+  
+  # Rules for when trust weights should be adjusted
+  adjustment_rules:
+    # When agent disagrees with consensus
+    disagree_with_consensus:
+      delta: -0.05
+      cooldown_sec: 3600  # 1 hour
+    
+    # When agent agrees with consensus
+    agree_with_consensus:
+      delta: 0.02
+      cooldown_sec: 1800  # 30 minutes
+    
+    # When agent proposes approved proposals
+    approved_proposal:
+      delta: 0.03
+      cooldown_sec: 3600  # 1 hour
+    
+    # When agent proposes rejected proposals
+    rejected_proposal:
+      delta: -0.03
+      cooldown_sec: 3600  # 1 hour 

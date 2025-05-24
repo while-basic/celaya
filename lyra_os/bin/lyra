@@ -1,0 +1,350 @@
+#!/usr/bin/env python3
+# ----------------------------------------------------------------------------
+#  File:        lyra
+#  Project:     Celaya Solutions
+#  Created by:  Celaya Solutions, 2025
+#  Author:      Christopher Celaya <chris@celayasolutions.com>
+#  Description: CLI entry point for Lyra OS
+#  Version:     1.0.0
+#  License:     BSL (SPDX id BUSL)
+#  Last Update: (May 2025)
+# ----------------------------------------------------------------------------
+
+"""
+Lyra OS CLI entry point.
+
+Provides commands for starting and managing the Lyra OS kernel.
+"""
+
+import argparse
+import asyncio
+import logging
+import os
+import signal
+import sys
+import time
+import platform
+import yaml
+from pathlib import Path
+
+# Add the parent directory to the path so we can import lyra_os modules
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
+
+from lyra_os.kernel import KernelService
+
+# Initialize logging
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+)
+logger = logging.getLogger("lyra")
+
+# Constants
+PID_FILE = os.path.expanduser("~/.lyra/lyra.pid")
+
+def parse_args():
+    """Parse command-line arguments."""
+    parser = argparse.ArgumentParser(
+        description="Lyra OS - Multi-agent operating system for Celaya"
+    )
+    subparsers = parser.add_subparsers(dest="command", help="Command to run")
+    
+    # Start command
+    start_parser = subparsers.add_parser("start", help="Start the Lyra OS kernel")
+    start_parser.add_argument(
+        "--config", "-c",
+        help="Path to configuration file",
+        default=os.environ.get("LYRA_CONFIG", os.path.join(
+            os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+            "conf",
+            "bootstrap.yaml"
+        ))
+    )
+    start_parser.add_argument(
+        "--interval", "-i",
+        help="Tick interval in milliseconds",
+        type=int,
+        default=os.environ.get("LYRA_TICK_INTERVAL", "1000")
+    )
+    start_parser.add_argument(
+        "--quorum", "-q",
+        help="Quorum threshold (0.0-1.0)",
+        type=float,
+        default=os.environ.get("LYRA_QUORUM_THRESHOLD", "0.66")
+    )
+    start_parser.add_argument(
+        "--debug", "-d",
+        help="Enable debug logging",
+        action="store_true"
+    )
+    start_parser.add_argument(
+        "--background", "-b",
+        help="Run in background",
+        action="store_true"
+    )
+    
+    # Status command
+    status_parser = subparsers.add_parser("status", help="Check the status of Lyra OS")
+    status_parser.add_argument(
+        "--verbose", "-v",
+        help="Show detailed status information",
+        action="store_true"
+    )
+    
+    # Stop command
+    stop_parser = subparsers.add_parser("stop", help="Stop the Lyra OS kernel")
+    stop_parser.add_argument(
+        "--force", "-f",
+        help="Force stop (don't wait for consensus)",
+        action="store_true"
+    )
+    
+    return parser.parse_args()
+
+async def start_kernel(config_path=None, tick_interval=1000, quorum_threshold=0.66, debug=False):
+    """
+    Start the Lyra OS kernel.
+    """
+    # Set up logging
+    if debug:
+        logging.basicConfig(level=logging.DEBUG)
+    else:
+        logging.basicConfig(level=logging.INFO)
+    
+    # Start the kernel
+    logger.info("Starting Lyra OS kernel...")
+    
+    try:
+        # Initialize the kernel
+        kernel = KernelService(
+            config_path=config_path,
+            tick_interval_ms=tick_interval,
+            debug=debug
+        )
+        
+        # Boot the kernel
+        await kernel.boot()
+        
+        # Set up signal handlers
+        loop = asyncio.get_running_loop()
+        for sig in (signal.SIGINT, signal.SIGTERM):
+            loop.add_signal_handler(sig, lambda: asyncio.create_task(shutdown(kernel)))
+        
+        # Keep the kernel running until interrupted
+        while True:
+            await asyncio.sleep(1)
+    except Exception as e:
+        logger.error(f"Error running Lyra OS kernel: {e}")
+        return 1
+    
+    return 0
+
+async def shutdown(kernel):
+    """
+    Shutdown the kernel gracefully.
+    
+    Args:
+        kernel: The KernelService instance
+    """
+    logger.info("Shutting down Lyra OS kernel...")
+    await kernel.shutdown()
+    
+    # Stop the event loop
+    loop = asyncio.get_event_loop()
+    loop.stop()
+
+def check_status():
+    """Check the status of the Lyra OS kernel."""
+    # This is a placeholder implementation
+    # In a real implementation, we would check for running processes
+    # or connect to a running kernel instance
+    
+    pid_file = os.path.expanduser("~/.lyra/lyra.pid")
+    
+    if os.path.exists(pid_file):
+        try:
+            with open(pid_file, 'r') as f:
+                pid = int(f.read().strip())
+                
+            # Check if the process is running
+            try:
+                os.kill(pid, 0)
+                logger.info(f"Lyra OS kernel is running (PID: {pid})")
+                return True
+            except OSError:
+                logger.info("Lyra OS kernel is not running (stale PID file)")
+                return False
+        except Exception as e:
+            logger.error(f"Error checking kernel status: {e}")
+            return False
+    else:
+        logger.info("Lyra OS kernel is not running")
+        return False
+
+def stop_kernel(force=False):
+    """
+    Stop the Lyra OS kernel.
+    
+    Args:
+        force: Whether to force stop the kernel
+    """
+    # This is a placeholder implementation
+    # In a real implementation, we would send a shutdown signal
+    # to the running kernel instance
+    
+    pid_file = os.path.expanduser("~/.lyra/lyra.pid")
+    
+    if os.path.exists(pid_file):
+        try:
+            with open(pid_file, 'r') as f:
+                pid = int(f.read().strip())
+                
+            # Try to send a termination signal
+            try:
+                if force:
+                    os.kill(pid, signal.SIGKILL)
+                    logger.info(f"Forcefully terminated Lyra OS kernel (PID: {pid})")
+                else:
+                    os.kill(pid, signal.SIGTERM)
+                    logger.info(f"Sent termination signal to Lyra OS kernel (PID: {pid})")
+                
+                # Remove the PID file
+                os.unlink(pid_file)
+                return True
+            except OSError:
+                logger.info("Lyra OS kernel is not running (stale PID file)")
+                os.unlink(pid_file)
+                return False
+        except Exception as e:
+            logger.error(f"Error stopping kernel: {e}")
+            return False
+    else:
+        logger.info("Lyra OS kernel is not running")
+        return False
+
+def is_kernel_running():
+    """Check if the kernel is already running."""
+    if not os.path.exists(PID_FILE):
+        logger.debug(f"PID file {PID_FILE} does not exist")
+        return False
+        
+    # Read the PID file
+    try:
+        with open(PID_FILE, 'r') as f:
+            pid = int(f.read().strip())
+            logger.debug(f"Read PID {pid} from file")
+    except (IOError, ValueError) as e:
+        logger.info(f"Invalid PID file: {e}")
+        remove_pid_file()
+        return False
+        
+    # Check if the process is running
+    try:
+        os.kill(pid, 0)
+        logger.debug(f"Process with PID {pid} exists")
+        return True
+    except OSError as e:
+        logger.info(f"Process with PID {pid} not running: {e}")
+        remove_pid_file()
+        return False
+
+def write_pid_file():
+    """Write the current PID to the PID file."""
+    # Create the directory if it doesn't exist
+    os.makedirs(os.path.dirname(PID_FILE), exist_ok=True)
+    
+    # Write the PID file
+    with open(PID_FILE, 'w') as f:
+        f.write(str(os.getpid()))
+
+def remove_pid_file():
+    """Remove the PID file."""
+    if os.path.exists(PID_FILE):
+        os.unlink(PID_FILE)
+
+def main():
+    """Main entry point."""
+    args = parse_args()
+    
+    # Set logging level
+    if getattr(args, 'debug', False):
+        logging.getLogger().setLevel(logging.DEBUG)
+    
+    # Handle commands
+    if args.command == "start":
+        # Create PID directory if it doesn't exist
+        pid_dir = os.path.expanduser("~/.lyra")
+        os.makedirs(pid_dir, exist_ok=True)
+        
+        # Make sure the PID file is gone
+        remove_pid_file()
+        
+        # If running in background, fork and exit
+        if args.background:
+            if os.fork() > 0:
+                # Parent process exits
+                sys.exit(0)
+                
+            # Child process continues
+            os.setsid()
+            
+            if os.fork() > 0:
+                # Second parent exits
+                sys.exit(0)
+                
+            # Redirect standard file descriptors
+            sys.stdout.flush()
+            sys.stderr.flush()
+            
+            with open(os.devnull, 'r') as null_in, \
+                 open(os.path.join(pid_dir, 'lyra.log'), 'a') as log_out, \
+                 open(os.path.join(pid_dir, 'lyra.err'), 'a') as log_err:
+                os.dup2(null_in.fileno(), sys.stdin.fileno())
+                os.dup2(log_out.fileno(), sys.stdout.fileno())
+                os.dup2(log_err.fileno(), sys.stderr.fileno())
+        
+        # Write PID file
+        write_pid_file()
+        
+        # Start the kernel
+        try:
+            asyncio.run(start_kernel(
+                config_path=args.config,
+                tick_interval=args.interval,
+                quorum_threshold=args.quorum,
+                debug=args.debug
+            ))
+        except KeyboardInterrupt:
+            logger.info("Lyra OS kernel stopped by user")
+        except Exception as e:
+            logger.error(f"Error running Lyra OS kernel: {e}", exc_info=True)
+            remove_pid_file()
+            sys.exit(1)
+        finally:
+            remove_pid_file()
+    elif args.command == "status":
+        # Check kernel status
+        is_running = check_status()
+        
+        if args.verbose and is_running:
+            # In a real implementation, we would fetch and display
+            # detailed status information from the running kernel
+            logger.info("Detailed status information:")
+            logger.info("  - Uptime: N/A")
+            logger.info("  - Active agents: N/A")
+            logger.info("  - Consensus proposals: N/A")
+        
+        sys.exit(0 if is_running else 1)
+    elif args.command == "stop":
+        # Stop the kernel
+        if stop_kernel(args.force):
+            sys.exit(0)
+        else:
+            sys.exit(1)
+    else:
+        # No command specified, show help
+        parse_args(["--help"])
+        sys.exit(1)
+
+if __name__ == "__main__":
+    main() 

@@ -1,0 +1,3 @@
+[console_scripts]
+celaya_python = celaya_python.cli.main:main
+lyra = lyra_os.bin.lyra:main
